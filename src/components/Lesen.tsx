@@ -48,6 +48,14 @@ export function Lesen({ data, teile, practice, onComplete }: LesenProps) {
     && item.options.includes('richtig')
     && item.options.includes('falsch');
 
+  // Keep a ref in sync with selected so the keyboard Enter handler fires even
+  // when pressed immediately after a number key (before React re-renders).
+  const selectedRef = useRef<string | null>(null);
+  function pick(val: string | null) {
+    selectedRef.current = val;
+    setSelected(val);
+  }
+
   const keyHandlerRef = useRef<(e: KeyboardEvent) => void>(() => {});
   keyHandlerRef.current = (e: KeyboardEvent) => {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -57,17 +65,18 @@ export function Lesen({ data, teile, practice, onComplete }: LesenProps) {
       return;
     }
     if (e.key === 'Enter') {
-      if (selected !== null) handleNext();
+      const cur = selectedRef.current ?? selected;
+      if (cur !== null) handleNext(cur);
       return;
     }
     const num = parseInt(e.key);
     if (isNaN(num) || num < 1) return;
     if (isRichtigFalsch) {
-      if (num === 1) setSelected('richtig');
-      if (num === 2) setSelected('falsch');
+      if (num === 1) pick('richtig');
+      if (num === 2) pick('falsch');
     } else {
       const vals = item.options.map(optionValue);
-      if (num <= vals.length) setSelected(vals[num - 1]);
+      if (num <= vals.length) pick(vals[num - 1]);
     }
   };
   useEffect(() => {
@@ -76,16 +85,17 @@ export function Lesen({ data, teile, practice, onComplete }: LesenProps) {
     return () => window.removeEventListener('keydown', fn);
   }, []);
 
-  function handleNext() {
-    if (selected === null) return;
+  function handleNext(valueOverride?: string) {
+    const val = valueOverride ?? selected;
+    if (val === null) return;
 
     const newAnswer: Answer = {
-      section: 'lesen', teil, itemId: item.id, value: selected,
+      section: 'lesen', teil, itemId: item.id, value: val,
     };
     const updated = [...answers, newAnswer];
 
     if (practice) {
-      setLastCorrect(selected === item.correct);
+      setLastCorrect(val === item.correct);
       setLastCorrectAnswer(getCorrectLabel(item));
       setPendingAnswers(updated);
       setPhase('feedback');
@@ -102,13 +112,13 @@ export function Lesen({ data, teile, practice, onComplete }: LesenProps) {
     if (itemIdx < teilData.items.length - 1) {
       setAnswers(updated);
       setItemIdx(i => i + 1);
-      setSelected(null);
+      pick(null);
       setPhase('item');
     } else if (teilIdx < TEILE.length - 1) {
       setAnswers(updated);
       setTeilIdx(t => t + 1);
       setItemIdx(0);
-      setSelected(null);
+      pick(null);
       setPhase('instruction');
     } else {
       onComplete(updated);
@@ -185,14 +195,14 @@ export function Lesen({ data, teile, practice, onComplete }: LesenProps) {
             <div className="rf-toggle">
               <button
                 type="button"
-                onClick={() => phase !== 'feedback' && setSelected('richtig')}
+                onClick={() => phase !== 'feedback' && pick('richtig')}
                 className={selected === 'richtig' ? 'active-richtig' : ''}
               >
                 <span className="kbd-hint">1</span> Richtig
               </button>
               <button
                 type="button"
-                onClick={() => phase !== 'feedback' && setSelected('falsch')}
+                onClick={() => phase !== 'feedback' && pick('falsch')}
                 className={selected === 'falsch' ? 'active-falsch' : ''}
               >
                 <span className="kbd-hint">2</span> Falsch
@@ -207,7 +217,7 @@ export function Lesen({ data, teile, practice, onComplete }: LesenProps) {
               return (
                 <label
                   key={opt}
-                  onClick={() => phase !== 'feedback' && setSelected(val)}
+                  onClick={() => phase !== 'feedback' && pick(val)}
                   className={`option-card ${isSelected ? 'selected-amber' : ''}`}
                 >
                   <input
@@ -215,7 +225,7 @@ export function Lesen({ data, teile, practice, onComplete }: LesenProps) {
                     name="lesen-answer"
                     value={val}
                     checked={isSelected}
-                    onChange={() => phase !== 'feedback' && setSelected(val)}
+                    onChange={() => phase !== 'feedback' && pick(val)}
                   />
                   <span className="kbd-hint shrink-0">{i + 1}</span>
                   <span className={isSelected ? 'font-bold' : ''}>{opt}</span>
@@ -229,7 +239,7 @@ export function Lesen({ data, teile, practice, onComplete }: LesenProps) {
         {phase !== 'feedback' && (
           <div className="flex justify-end pt-2">
             <button
-              onClick={handleNext}
+              onClick={() => handleNext()}
               disabled={selected === null}
               className="btn-3d btn-3d-primary"
             >

@@ -12,6 +12,7 @@ import { Results } from './components/Results';
 import { Study } from './components/Study';
 import { History } from './components/History';
 import { saveResult, savePracticeResult } from './history';
+import { WordLookupProvider } from './components/WordPopup';
 
 type Screen = 'home' | 'section-picker' | 'hoeren' | 'lesen' | 'schreiben' | 'sprechen' | 'scoring' | 'results' | 'study' | 'history';
 type Mode = 'exam' | 'practice';
@@ -375,8 +376,8 @@ function App() {
         </div>
       )}
 
-      {/* Section content */}
-      <div className="flex-1">
+      {/* Section content — wrapped in WordLookupProvider in practice mode */}
+      <WordLookupProvider enabled={mode === 'practice'}>
         {screen === 'hoeren' && (
           <Hoeren
             data={test.hoeren}
@@ -407,7 +408,7 @@ function App() {
             onComplete={handleSprechenDone}
           />
         )}
-      </div>
+      </WordLookupProvider>
     </div>
   );
 }
