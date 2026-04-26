@@ -11,11 +11,12 @@ import { Sprechen } from './components/Sprechen';
 import { Results } from './components/Results';
 import { Study } from './components/Study';
 import { History } from './components/History';
-import { saveResult } from './history';
+import { saveResult, savePracticeResult } from './history';
 
 type Screen = 'home' | 'section-picker' | 'hoeren' | 'lesen' | 'schreiben' | 'sprechen' | 'scoring' | 'results' | 'study' | 'history';
 type Mode = 'exam' | 'practice';
 
+// Fixed exam sequence
 const EXAM_SECTIONS: Screen[] = ['hoeren', 'lesen', 'schreiben', 'sprechen'];
 const LABELS: Record<string, string> = {
   hoeren: 'Hören',
@@ -37,6 +38,7 @@ function App() {
   const [result, setResult] = useState<ExamResult | null>(null);
   const [practiceSection, setPracticeSection] = useState<Section>('hoeren');
   const [practiceTeile, setPracticeTeile] = useState<Teil[] | null>(null); // null = all
+  const [abandonConfirm, setAbandonConfirm] = useState(false);
   const answersRef = useRef<Answer[]>([]);
 
   const test = tests.find(t => t.id === testId) || tests[0];
@@ -49,15 +51,16 @@ function App() {
     setPracticeTeile(null);
     answersRef.current = [];
     setResult(null);
+    setAbandonConfirm(false);
     setScreen('hoeren');
   }
 
   function handlePracticeSection(_id: number, section: Section) {
-    // Show section picker instead of jumping straight in
     setPracticeSection(section);
     setMode('practice');
     answersRef.current = [];
     setResult(null);
+    setAbandonConfirm(false);
     setScreen('section-picker');
   }
 
@@ -70,26 +73,42 @@ function App() {
     setScreen(practiceSection);
   }
 
-  function handleSectionDone(newAnswers: Answer[], next: Screen) {
+  // Unified session handler — exam advances through the fixed sequence;
+  // practice scores the section immediately and shows results.
+  async function handleSectionDone(newAnswers: Answer[], next: Screen) {
     answersRef.current = [...answersRef.current, ...newAnswers];
+
     if (mode === 'exam') {
       setScreen(next);
-    } else {
-      setScreen('home');
+      return;
     }
+
+    // Practice mode: score this section and surface results
+    const section = screen as Section;
+    let score: SectionScore;
+
+    if (section === 'hoeren' || section === 'lesen') {
+      score = scoreMC(section, newAnswers);
+    } else {
+      // schreiben — async LLM scoring
+      setScreen('scoring');
+      score = await scoreSchreibenFn(newAnswers);
+    }
+
+    const practiceResult: ExamResult = {
+      testId: test.id,
+      sections: [score],
+      totalPoints: score.points,
+      maxPoints: score.maxPoints,
+      passed: score.passed,
+    };
+    savePracticeResult(practiceResult, section);
+    setResult(practiceResult);
+    setScreen('results');
   }
 
   async function handleSprechenDone(conversation: ChatMessage[]) {
-    if (mode === 'practice') {
-      setScreen('home');
-      return;
-    }
     setScreen('scoring');
-    const all = answersRef.current;
-
-    const hScore = scoreMC('hoeren', all);
-    const lScore = scoreMC('lesen', all);
-    const sScore = await scoreSchreibenFn(all);
     const spResult = await scoreSprechenFn(conversation);
 
     const spScore: SectionScore = {
@@ -98,11 +117,31 @@ function App() {
       passed: spResult.score >= 9,
     };
 
+    if (mode === 'practice') {
+      const practiceResult: ExamResult = {
+        testId: test.id,
+        sections: [spScore],
+        totalPoints: spScore.points,
+        maxPoints: spScore.maxPoints,
+        passed: spScore.passed,
+        sprechenFeedback: spResult.feedback,
+      };
+      savePracticeResult(practiceResult, 'sprechen');
+      setResult(practiceResult);
+      setScreen('results');
+      return;
+    }
+
+    // Full exam: score all sections together
+    const all = answersRef.current;
+    const hScore = scoreMC('hoeren', all);
+    const lScore = scoreMC('lesen', all);
+    const sScore = await scoreSchreibenFn(all);
     const sections = [hScore, lScore, sScore, spScore];
     const totalPoints = sections.reduce((s, sec) => s + sec.points, 0);
     const maxPoints = sections.reduce((s, sec) => s + sec.maxPoints, 0);
 
-    const examResult = {
+    const examResult: ExamResult = {
       testId: test.id, sections, totalPoints, maxPoints,
       passed: totalPoints >= maxPoints * 0.6 && sections.every(s => s.passed),
       sprechenFeedback: spResult.feedback,
@@ -113,7 +152,19 @@ function App() {
   }
 
   function goHome() {
+    setAbandonConfirm(false);
     setScreen('home');
+  }
+
+  function handleAbandon() {
+    setAbandonConfirm(false);
+    goHome();
+  }
+
+  function restartPractice() {
+    answersRef.current = [];
+    setResult(null);
+    setScreen('section-picker');
   }
 
   // ── Scoring helpers ─────────────────────────────────────────────
@@ -223,7 +274,8 @@ function App() {
     return (
       <Results
         result={result}
-        onRestart={() => handleStartExam(testId)}
+        mode={mode}
+        onRestart={mode === 'exam' ? () => handleStartExam(testId) : restartPractice}
         onHome={goHome}
       />
     );
@@ -248,7 +300,7 @@ function App() {
       <div className="bg-white border-b-2 border-card-border px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <button
-            onClick={goHome}
+            onClick={() => setAbandonConfirm(true)}
             className="text-sm font-bold text-gray-400 hover:text-telc transition-colors"
           >
             &larr; Zurück
@@ -284,6 +336,32 @@ function App() {
           </span>
         )}
       </div>
+
+      {/* Abandon confirmation modal */}
+      {abandonConfirm && (
+        <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4 fade-in">
+            <p className="font-extrabold text-gray-800 text-lg">Sitzung beenden?</p>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Dein Fortschritt in dieser Sektion geht verloren und wird nicht gespeichert.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleAbandon}
+                className="btn-3d btn-3d-danger flex-1"
+              >
+                Ja, beenden
+              </button>
+              <button
+                onClick={() => setAbandonConfirm(false)}
+                className="btn-3d btn-3d-secondary flex-1"
+              >
+                Abbrechen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Section content */}
       <div className="flex-1">

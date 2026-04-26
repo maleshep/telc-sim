@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { VocabWord, VocabTopic } from '../study-data';
+import type { VocabTopic } from '../study-data';
 import { studyData } from '../study-data';
 import {
   ArrowLeft, RotateCcw, ChevronLeft, ChevronRight,

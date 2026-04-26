@@ -1,10 +1,12 @@
-import type { ExamResult } from './types';
+import type { ExamResult, Section } from './types';
 
 const STORAGE_KEY = 'telc-a1-history';
 
 export interface HistoryEntry {
   id: string;
   date: string;          // ISO string
+  type: 'exam' | 'practice';
+  section?: Section;     // only for practice entries
   result: ExamResult;
 }
 
@@ -12,7 +14,9 @@ export function loadHistory(): HistoryEntry[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
-    return JSON.parse(raw) as HistoryEntry[];
+    const entries = JSON.parse(raw) as HistoryEntry[];
+    // Back-fill type for entries saved before this field existed
+    return entries.map(e => ({ ...e, type: e.type ?? 'exam' }));
   } catch {
     return [];
   }
@@ -22,10 +26,25 @@ export function saveResult(result: ExamResult): HistoryEntry {
   const entry: HistoryEntry = {
     id: crypto.randomUUID(),
     date: new Date().toISOString(),
+    type: 'exam',
     result,
   };
   const history = loadHistory();
-  history.unshift(entry); // newest first
+  history.unshift(entry);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  return entry;
+}
+
+export function savePracticeResult(result: ExamResult, section: Section): HistoryEntry {
+  const entry: HistoryEntry = {
+    id: crypto.randomUUID(),
+    date: new Date().toISOString(),
+    type: 'practice',
+    section,
+    result,
+  };
+  const history = loadHistory();
+  history.unshift(entry);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
   return entry;
 }

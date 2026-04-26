@@ -10,6 +10,8 @@ interface HistoryProps {
   onBack: () => void;
 }
 
+type Filter = 'all' | 'exam' | 'practice';
+
 const SECTION_LABELS: Record<string, string> = {
   hoeren: 'Hören',
   lesen: 'Lesen',
@@ -46,7 +48,7 @@ function StatsOverview({ stats }: { stats: HistoryStats }) {
       <div className="grid grid-cols-3 gap-3">
         <div className="card !rounded-2xl p-4 text-center">
           <div className="text-3xl font-extrabold text-telc">{stats.totalTests}</div>
-          <div className="text-xs text-gray-400 font-bold mt-1">Tests</div>
+          <div className="text-xs text-gray-400 font-bold mt-1">Einträge</div>
         </div>
         <div className="card !rounded-2xl p-4 text-center">
           <div className="text-3xl font-extrabold text-correct">{stats.passed}</div>
@@ -122,6 +124,7 @@ function StatsOverview({ stats }: { stats: HistoryStats }) {
 function EntryCard({ entry }: { entry: HistoryEntry }) {
   const r = entry.result;
   const pct = r.maxPoints > 0 ? Math.round((r.totalPoints / r.maxPoints) * 100) : 0;
+  const isPractice = (entry.type ?? 'exam') === 'practice';
 
   return (
     <div className={`card !rounded-2xl p-4 slide-in ${r.passed ? '' : 'border-wrong/20'}`}>
@@ -135,13 +138,18 @@ function EntryCard({ entry }: { entry: HistoryEntry }) {
           }
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center flex-wrap gap-2">
             <span className="font-extrabold">{r.totalPoints.toFixed(1)} / {r.maxPoints}</span>
             <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
               r.passed ? 'bg-correct/10 text-correct' : 'bg-wrong/10 text-wrong'
             }`}>
               {pct}%
             </span>
+            {isPractice && entry.section && (
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-section-lesen-light text-section-lesen-dark">
+                Übung: {SECTION_LABELS[entry.section]}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium mt-0.5">
             <Calendar size={11} />
@@ -151,21 +159,40 @@ function EntryCard({ entry }: { entry: HistoryEntry }) {
       </div>
 
       {/* Mini section bars */}
-      <div className="grid grid-cols-4 gap-2 mt-3">
+      <div className={`grid gap-2 mt-3 ${r.sections.length === 1 ? 'grid-cols-1' : 'grid-cols-4'}`}>
         {r.sections.map(s => (
-          <div key={s.section} className="text-center">
-            <div className="progress-track !h-1.5 mb-1">
-              <div
-                className={`progress-fill ${SECTION_COLORS[s.section]}`}
-                style={{ width: `${s.maxPoints > 0 ? (s.points / s.maxPoints) * 100 : 0}%` }}
-              />
-            </div>
-            <div className="text-[10px] font-bold text-gray-400">
-              {SECTION_LABELS[s.section]}
-            </div>
-            <div className="text-xs font-extrabold">
-              {s.points.toFixed(1)}
-            </div>
+          <div key={s.section} className={r.sections.length === 1 ? 'flex items-center gap-3' : 'text-center'}>
+            {r.sections.length === 1 ? (
+              <>
+                <span className={`font-bold text-xs w-16 shrink-0 ${SECTION_TEXT[s.section]}`}>
+                  {SECTION_LABELS[s.section]}
+                </span>
+                <div className="flex-1 progress-track !h-1.5">
+                  <div
+                    className={`progress-fill ${SECTION_COLORS[s.section]}`}
+                    style={{ width: `${s.maxPoints > 0 ? (s.points / s.maxPoints) * 100 : 0}%` }}
+                  />
+                </div>
+                <span className="text-xs font-extrabold w-12 text-right shrink-0">
+                  {s.points.toFixed(1)} / {s.maxPoints}
+                </span>
+              </>
+            ) : (
+              <>
+                <div className="progress-track !h-1.5 mb-1">
+                  <div
+                    className={`progress-fill ${SECTION_COLORS[s.section]}`}
+                    style={{ width: `${s.maxPoints > 0 ? (s.points / s.maxPoints) * 100 : 0}%` }}
+                  />
+                </div>
+                <div className="text-[10px] font-bold text-gray-400">
+                  {SECTION_LABELS[s.section]}
+                </div>
+                <div className="text-xs font-extrabold">
+                  {s.points.toFixed(1)}
+                </div>
+              </>
+            )}
           </div>
         ))}
       </div>
@@ -175,14 +202,26 @@ function EntryCard({ entry }: { entry: HistoryEntry }) {
 
 export function History({ onBack }: HistoryProps) {
   const [entries, setEntries] = useState(() => loadHistory());
-  const stats = computeStats(entries);
+  const [filter, setFilter] = useState<Filter>('all');
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const filteredEntries = filter === 'all'
+    ? entries
+    : entries.filter(e => (e.type ?? 'exam') === filter);
+
+  const stats = computeStats(filteredEntries);
 
   function handleClear() {
     clearHistory();
     setEntries([]);
     setShowConfirm(false);
   }
+
+  const filterLabels: Record<Filter, string> = {
+    all: 'Alle',
+    exam: 'Prüfungen',
+    practice: 'Übungen',
+  };
 
   return (
     <div className="min-h-dvh flex flex-col bg-exam-bg">
@@ -192,8 +231,24 @@ export function History({ onBack }: HistoryProps) {
           <ArrowLeft size={20} />
         </button>
         <Award size={20} className="text-telc" />
-        <h1 className="font-extrabold text-lg">Prüfungsverlauf</h1>
+        <h1 className="font-extrabold text-lg">Verlauf</h1>
         <div className="flex-1" />
+
+        {/* Filter toggle */}
+        <div className="flex gap-1 bg-exam-bg rounded-xl p-1 mr-2">
+          {(['all', 'exam', 'practice'] as Filter[]).map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                filter === f ? 'bg-telc text-white shadow-sm' : 'text-gray-400 hover:text-telc'
+              }`}
+            >
+              {filterLabels[f]}
+            </button>
+          ))}
+        </div>
+
         {entries.length > 0 && !showConfirm && (
           <button
             onClick={() => setShowConfirm(true)}
@@ -221,14 +276,19 @@ export function History({ onBack }: HistoryProps) {
           </div>
         )}
 
-        {entries.length === 0 ? (
+        {filteredEntries.length === 0 ? (
           <div className="card !rounded-2xl p-12 text-center fade-in">
             <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
               <Award size={28} className="text-gray-300" />
             </div>
-            <p className="font-bold text-gray-400 text-lg mb-1">Noch keine Tests</p>
+            <p className="font-bold text-gray-400 text-lg mb-1">
+              {entries.length === 0 ? 'Noch keine Einträge' : `Keine ${filterLabels[filter]}`}
+            </p>
             <p className="text-sm text-gray-400">
-              Absolviere eine Prüfung im Prüfungsmodus, um deinen Fortschritt zu sehen.
+              {entries.length === 0
+                ? 'Absolviere eine Prüfung oder übe einzelne Sektionen, um deinen Fortschritt zu sehen.'
+                : 'Wechsle den Filter, um andere Einträge zu sehen.'
+              }
             </p>
           </div>
         ) : (
@@ -236,11 +296,11 @@ export function History({ onBack }: HistoryProps) {
             {stats && <StatsOverview stats={stats} />}
 
             <h3 className="font-bold text-sm text-gray-500 pt-2 flex items-center gap-2">
-              <Calendar size={14} /> Letzte Tests
+              <Calendar size={14} /> Letzte Einträge
             </h3>
 
             <div className="space-y-3">
-              {entries.map(entry => (
+              {filteredEntries.map(entry => (
                 <EntryCard key={entry.id} entry={entry} />
               ))}
             </div>

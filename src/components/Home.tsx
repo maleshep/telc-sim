@@ -3,7 +3,7 @@ import type { TelcTest, Section } from '../types';
 import {
   Headphones, BookOpen, PenTool, MessageSquare,
   ChevronRight, Play, BookMarked, GraduationCap, Languages,
-  Sparkles, Award,
+  Sparkles, Award, AlertCircle,
 } from 'lucide-react';
 import { isTTSAvailable, isSTTAvailable, isUsingFallbackTTS } from '../speech';
 import { isLLMConfigured } from '../llm';
@@ -46,6 +46,17 @@ export function Home({ tests, onStartExam, onPractice, onStudy, onHistory }: Hom
   const llm = isLLMConfigured();
   const history = loadHistory();
   const stats = computeStats(history);
+
+  // Find the single weakest section (lowest pass rate, below 60%)
+  const weakestSection = (() => {
+    if (!stats) return null;
+    const ordered = (['hoeren', 'lesen', 'schreiben', 'sprechen'] as Section[])
+      .filter(sec => stats.sectionAvg[sec] && stats.sectionAvg[sec].passRate < 60)
+      .sort((a, b) => stats.sectionAvg[a].passRate - stats.sectionAvg[b].passRate);
+    return ordered[0] ?? null;
+  })();
+
+  const weakInfo = weakestSection ? SECTION_INFO.find(s => s.key === weakestSection) : null;
 
   return (
     <div className="min-h-dvh flex flex-col bg-exam-bg">
@@ -156,6 +167,29 @@ export function Home({ tests, onStartExam, onPractice, onStudy, onHistory }: Hom
           </div>
         </section>
 
+        {/* Weak area nudge — shown only when there's a section below 60% pass rate */}
+        {weakInfo && weakestSection && (
+          <div className="card !rounded-2xl p-4 !border-wrong/25 !bg-wrong/5 fade-in">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-wrong/10 flex items-center justify-center shrink-0">
+                <AlertCircle size={20} className="text-wrong" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-bold text-sm text-wrong">Schwachstelle: {weakInfo.label}</div>
+                <div className="text-xs text-gray-500 mt-0.5">
+                  {Math.round(stats!.sectionAvg[weakestSection].passRate)}% Bestehensquote — noch Verbesserungspotential
+                </div>
+              </div>
+              <button
+                onClick={() => onPractice(selectedTest, weakestSection)}
+                className="btn-3d btn-3d-danger !py-1.5 !px-3 !text-xs shrink-0"
+              >
+                Jetzt üben
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Study materials + History row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 fade-in">
           <button
@@ -180,10 +214,10 @@ export function Home({ tests, onStartExam, onPractice, onStudy, onHistory }: Hom
               <Award size={20} />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="font-bold text-sm group-hover:text-telc transition-colors">Prüfungsverlauf</div>
+              <div className="font-bold text-sm group-hover:text-telc transition-colors">Verlauf</div>
               <div className="text-xs text-gray-400 truncate">
                 {stats
-                  ? `${stats.totalTests} Tests — ${Math.round(stats.avgPct)}% Durchschnitt`
+                  ? `${stats.totalTests} Einträge — ${Math.round(stats.avgPct)}% Durchschnitt`
                   : 'Noch keine Tests absolviert'
                 }
               </div>
