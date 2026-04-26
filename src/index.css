@@ -279,6 +279,35 @@ a {
 }
 
 /* ═══════════════════════════════════════════════════════
+   Keyboard shortcut badge — shown inside option cards
+   ═══════════════════════════════════════════════════════ */
+.kbd-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.25rem;
+  border-radius: 0.25rem;
+  border: 1.5px solid #cbd5e1;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8;
+  background: #f8fafc;
+  font-family: ui-monospace, monospace;
+  margin-right: 0.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.option-card:hover .kbd-hint,
+.option-card.selected-blue .kbd-hint,
+.option-card.selected-amber .kbd-hint,
+.option-card.selected .kbd-hint {
+  border-color: currentColor;
+  opacity: 0.6;
+}
+
+/* ═══════════════════════════════════════════════════════
    PROGRESS BARS (thick, with animation)
    ═══════════════════════════════════════════════════════ */
 

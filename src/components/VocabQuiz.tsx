@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { studyData } from '../study-data';
 import { ArrowLeft, Zap } from 'lucide-react';
 import { TopicPicker } from './Flashcards';
@@ -105,6 +105,23 @@ export function VocabQuiz({ onBack }: VocabQuizProps) {
     setFinished(false);
   }
 
+  const keyHandlerRef = useRef<(e: KeyboardEvent) => void>(() => {});
+  keyHandlerRef.current = (e: KeyboardEvent) => {
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+    if (finished || !question) return;
+    if (showFeedback) return; // AnswerFeedback handles Enter
+    if (e.key === 'Enter' && selected !== null) { handleContinue(); return; }
+    const num = parseInt(e.key);
+    if (!isNaN(num) && num >= 1 && num <= question.options.length) {
+      handleSelect(question.options[num - 1]);
+    }
+  };
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => keyHandlerRef.current(e);
+    window.addEventListener('keydown', fn);
+    return () => window.removeEventListener('keydown', fn);
+  }, []);
+
   // ── Topic picker ────────────────────────────────────────────────
   if (!topicId) {
     return (
@@ -202,10 +219,10 @@ export function VocabQuiz({ onBack }: VocabQuizProps) {
 
         {/* Options */}
         <div className="space-y-2">
-          {question.options.map((opt) => {
+          {question.options.map((opt, i) => {
             let extraClass = '';
             if (showFeedback) {
-              if (opt === question.correctEnglish) extraClass = 'selected'; // green
+              if (opt === question.correctEnglish) extraClass = 'selected';
               else if (opt === selected && !isCorrect) extraClass = '!border-wrong !bg-wrong/5';
             } else if (selected === opt) {
               extraClass = 'selected';
@@ -216,9 +233,10 @@ export function VocabQuiz({ onBack }: VocabQuizProps) {
                 key={opt}
                 onClick={() => handleSelect(opt)}
                 disabled={showFeedback}
-                className={`option-card w-full !justify-center !text-center ${extraClass}`}
+                className={`option-card w-full ${extraClass}`}
               >
-                <span className="font-bold">{opt}</span>
+                <span className="kbd-hint shrink-0">{i + 1}</span>
+                <span className="font-bold flex-1 text-center">{opt}</span>
               </button>
             );
           })}

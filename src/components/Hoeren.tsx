@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { HoerenTeil, Answer, Teil } from '../types';
 import { speak, stopSpeaking } from '../speech';
 import { Volume2, RotateCcw, ChevronRight, Headphones } from 'lucide-react';
@@ -48,6 +48,35 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
   const isRichtigFalsch = item?.options.length === 2
     && item.options.includes('richtig')
     && item.options.includes('falsch');
+
+  // Keyboard shortcuts — always-fresh ref pattern avoids stale closures
+  const keyHandlerRef = useRef<(e: KeyboardEvent) => void>(() => {});
+  keyHandlerRef.current = (e: KeyboardEvent) => {
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+    if (phase === 'feedback') return; // AnswerFeedback handles Enter in feedback phase
+    if (phase === 'instruction') {
+      if (e.key === 'Enter') { setPhase('item'); }
+      return;
+    }
+    if (e.key === 'Enter') {
+      if (selected !== null && !isPlaying) handleNext();
+      return;
+    }
+    const num = parseInt(e.key);
+    if (isNaN(num) || num < 1) return;
+    if (isRichtigFalsch) {
+      if (num === 1) setSelected('richtig');
+      if (num === 2) setSelected('falsch');
+    } else {
+      const vals = item.options.map(optionValue);
+      if (num <= vals.length) setSelected(vals[num - 1]);
+    }
+  };
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => keyHandlerRef.current(e);
+    window.addEventListener('keydown', fn);
+    return () => window.removeEventListener('keydown', fn);
+  }, []);
 
   async function playAudio() {
     if (!item || isPlaying) return;
@@ -205,20 +234,20 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
                 onClick={() => phase !== 'feedback' && setSelected('richtig')}
                 className={selected === 'richtig' ? 'active-richtig' : ''}
               >
-                Richtig
+                <span className="kbd-hint">1</span> Richtig
               </button>
               <button
                 type="button"
                 onClick={() => phase !== 'feedback' && setSelected('falsch')}
                 className={selected === 'falsch' ? 'active-falsch' : ''}
               >
-                Falsch
+                <span className="kbd-hint">2</span> Falsch
               </button>
             </div>
           </div>
         ) : (
           <div className="space-y-2">
-            {item.options.map((opt) => {
+            {item.options.map((opt, i) => {
               const val = optionValue(opt);
               const isSelected = selected === val;
               return (
@@ -234,6 +263,7 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
                     checked={isSelected}
                     onChange={() => phase !== 'feedback' && setSelected(val)}
                   />
+                  <span className="kbd-hint shrink-0">{i + 1}</span>
                   <span className={isSelected ? 'font-bold' : ''}>{opt}</span>
                 </label>
               );

@@ -253,9 +253,6 @@ function App() {
     return (
       <SectionPicker
         section={practiceSection}
-        tests={tests}
-        selectedTestId={testId}
-        onSelectTest={setTestId}
         onStart={handleSectionPickerStart}
         onBack={goHome}
       />

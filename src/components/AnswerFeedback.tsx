@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 
 interface AnswerFeedbackProps {
@@ -7,6 +8,17 @@ interface AnswerFeedbackProps {
 }
 
 export function AnswerFeedback({ isCorrect, correctAnswer, onContinue }: AnswerFeedbackProps) {
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onContinue();
+      }
+    };
+    window.addEventListener('keydown', fn);
+    return () => window.removeEventListener('keydown', fn);
+  }, [onContinue]);
+
   return (
     <div className={`fixed bottom-0 left-0 right-0 z-50 bounce-in ${
       isCorrect ? 'bg-correct' : 'bg-wrong'

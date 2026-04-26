@@ -1,4 +1,4 @@
-import type { Section, Teil, TelcTest } from '../types';
+import type { Section, Teil } from '../types';
 import {
   Headphones, BookOpen, PenTool, MessageSquare,
   ChevronRight, ArrowLeft, Play, Layers,
@@ -6,9 +6,6 @@ import {
 
 interface SectionPickerProps {
   section: Section;
-  tests: TelcTest[];
-  selectedTestId: number;
-  onSelectTest: (testId: number) => void;
   onStart: (teil: Teil | 'all') => void;
   onBack: () => void;
 }
@@ -159,7 +156,7 @@ const SECTION_META: Record<Section, {
   },
 };
 
-export function SectionPicker({ section, tests, selectedTestId, onSelectTest, onStart, onBack }: SectionPickerProps) {
+export function SectionPicker({ section, onStart, onBack }: SectionPickerProps) {
   const meta = SECTION_META[section];
   const Icon = meta.icon;
 
@@ -181,26 +178,6 @@ export function SectionPicker({ section, tests, selectedTestId, onSelectTest, on
         {/* Section intro */}
         <div className={`${meta.colorLight} border-2 ${meta.colorBorder} rounded-2xl p-5 fade-in`}>
           <p className="text-gray-700 font-medium leading-relaxed">{meta.intro}</p>
-        </div>
-
-        {/* Test selector */}
-        <div className="flex items-center gap-3 fade-in">
-          <span className="text-sm font-bold text-gray-500">Variante:</span>
-          <div className="flex gap-2">
-            {tests.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => onSelectTest(t.id)}
-                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                  selectedTestId === t.id
-                    ? `${meta.color} text-white shadow-sm`
-                    : 'bg-white text-gray-500 border-2 border-card-border hover:border-gray-300'
-                }`}
-              >
-                {t.name}
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* All Teile button */}

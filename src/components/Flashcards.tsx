@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import type { VocabTopic } from '../study-data';
 import { studyData } from '../study-data';
 import {
@@ -65,6 +65,21 @@ export function Flashcards({ onBack }: FlashcardsProps) {
     setFlipped(false);
     setKnown(new Set());
   }
+
+  const keyHandlerRef = useRef<(e: KeyboardEvent) => void>(() => {});
+  keyHandlerRef.current = (e: KeyboardEvent) => {
+    if (!topicId || !card) return;
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setFlipped(f => !f); }
+    else if (e.key === 'ArrowRight') nextCard();
+    else if (e.key === 'ArrowLeft') prevCard();
+    else if (e.key === 'k' || e.key === 'K') markKnown();
+  };
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => keyHandlerRef.current(e);
+    window.addEventListener('keydown', fn);
+    return () => window.removeEventListener('keydown', fn);
+  }, []);
 
   // ── Topic Picker ────────────────────────────────────────────────
   if (!topicId) {
