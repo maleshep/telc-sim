@@ -90,6 +90,20 @@ export function Schreiben({ data, teile, onComplete }: SchreibenProps) {
           <Timer seconds={SCHREIBEN_TIME} onExpired={handleTimeUp} />
         </div>
 
+        {/* Person information card */}
+        {data.teil1.personCard.length > 0 && (
+          <div className="mb-4 bg-section-schreiben-light border-2 border-section-schreiben/20 rounded-2xl p-5">
+            <p className="text-xs font-extrabold text-section-schreiben uppercase tracking-wider mb-3">
+              Informationen
+            </p>
+            <div className="space-y-1.5">
+              {data.teil1.personCard.map((line, i) => (
+                <p key={i} className="text-sm font-medium text-gray-700 font-mono">{line}</p>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="card !rounded-2xl p-6 md:p-8 space-y-6">
           <h3 className="font-bold text-lg flex items-center gap-2">
             <PenTool size={20} className="text-section-schreiben" />
@@ -118,7 +132,7 @@ export function Schreiben({ data, teile, onComplete }: SchreibenProps) {
               onClick={submitForm}
               className="btn-3d btn-3d-primary"
             >
-              Weiter zu Teil 2 <ChevronRight size={18} />
+              {hasTeil2 ? <>Weiter zu Teil 2 <ChevronRight size={18} /></> : <>Abgeben <ChevronRight size={18} /></>}
             </button>
           </div>
         </div>

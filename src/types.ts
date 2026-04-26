@@ -31,6 +31,7 @@ export interface LesenTeil {
 export interface SchreibenTeil1 {
   instruction: string;
   formTitle: string;
+  personCard: string[];   // Fictional person's data shown to the user
   fields: { label: string; answer: string; hint?: string }[];
 }
 

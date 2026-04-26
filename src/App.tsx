@@ -171,55 +171,70 @@ function App() {
 
   function scoreMC(section: Section, allAnswers: Answer[]): SectionScore {
     const sData = section === 'hoeren' ? test.hoeren : test.lesen;
-    const items = [
-      ...sData.teil1.items.map(i => ({ teil: 'teil1', id: i.id, correct: i.correct })),
-      ...sData.teil2.items.map(i => ({ teil: 'teil2', id: i.id, correct: i.correct })),
-      ...sData.teil3.items.map(i => ({ teil: 'teil3', id: i.id, correct: i.correct })),
+    const allItems = [
+      ...sData.teil1.items.map(i => ({ teil: 'teil1' as Teil, id: i.id, correct: i.correct })),
+      ...sData.teil2.items.map(i => ({ teil: 'teil2' as Teil, id: i.id, correct: i.correct })),
+      ...sData.teil3.items.map(i => ({ teil: 'teil3' as Teil, id: i.id, correct: i.correct })),
     ];
+
+    const sectionAnswers = allAnswers.filter(a => a.section === section);
+    const answeredTeile = new Set(sectionAnswers.map(a => a.teil));
+    const items = answeredTeile.size > 0
+      ? allItems.filter(item => answeredTeile.has(item.teil))
+      : allItems;
 
     let correct = 0;
     for (const item of items) {
-      const a = allAnswers.find(
-        ans => ans.section === section && ans.teil === item.teil && ans.itemId === item.id,
+      const a = sectionAnswers.find(
+        ans => ans.teil === item.teil && ans.itemId === item.id,
       );
       if (a && a.value === item.correct) correct++;
     }
 
     const total = items.length;
-    const max = 15;
-    const pts = total > 0 ? Math.round((correct / total) * max * 10) / 10 : 0;
-    return { section, correct, total, points: pts, maxPoints: max, passed: pts >= max * 0.6 };
+    return { section, correct, total, points: correct, maxPoints: total, passed: total > 0 && correct >= total * 0.6 };
   }
 
   async function scoreSchreibenFn(allAnswers: Answer[]): Promise<SectionScore> {
+    const hasT1 = allAnswers.some(a => a.section === 'schreiben' && a.teil === 'teil1');
+    const hasT2 = allAnswers.some(a => a.section === 'schreiben' && a.teil === 'teil2');
+
     let pts = 0;
-
-    const fields = test.schreiben.teil1.fields;
+    let maxPts = 0;
     let t1ok = 0;
-    for (let i = 0; i < fields.length; i++) {
-      const a = allAnswers.find(
-        ans => ans.section === 'schreiben' && ans.teil === 'teil1' && ans.itemId === i,
-      );
-      if (a && matchField(fields[i].answer, a.value)) t1ok++;
-    }
-    pts += fields.length > 0 ? (t1ok / fields.length) * 5 : 0;
+    const fields = test.schreiben.teil1.fields;
 
-    const textAns = allAnswers.find(a => a.section === 'schreiben' && a.teil === 'teil2')?.value || '';
-    if (isLLMConfigured() && textAns.trim()) {
-      const r = await evaluateSchreiben(
-        test.schreiben.teil2.situation, test.schreiben.teil2.bullets,
-        textAns, test.schreiben.teil2.minWords,
-      );
-      pts += Math.min(10, r.score);
-    } else {
-      const wc = textAns.trim().split(/\s+/).filter(Boolean).length;
-      pts += Math.round(Math.min(1, wc / Math.max(1, test.schreiben.teil2.minWords)) * 10);
+    if (hasT1) {
+      maxPts += 5;
+      for (let i = 0; i < fields.length; i++) {
+        const a = allAnswers.find(
+          ans => ans.section === 'schreiben' && ans.teil === 'teil1' && ans.itemId === i,
+        );
+        if (a && matchField(fields[i].answer, a.value)) t1ok++;
+      }
+      pts += fields.length > 0 ? (t1ok / fields.length) * 5 : 0;
     }
 
+    if (hasT2) {
+      maxPts += 10;
+      const textAns = allAnswers.find(a => a.section === 'schreiben' && a.teil === 'teil2')?.value || '';
+      if (isLLMConfigured() && textAns.trim()) {
+        const r = await evaluateSchreiben(
+          test.schreiben.teil2.situation, test.schreiben.teil2.bullets,
+          textAns, test.schreiben.teil2.minWords,
+        );
+        pts += Math.min(10, r.score);
+      } else {
+        const wc = textAns.trim().split(/\s+/).filter(Boolean).length;
+        pts += Math.round(Math.min(1, wc / Math.max(1, test.schreiben.teil2.minWords)) * 10);
+      }
+    }
+
+    const effectiveMax = maxPts || 15;
     pts = Math.round(pts * 10) / 10;
     return {
-      section: 'schreiben', correct: t1ok, total: fields.length,
-      points: pts, maxPoints: 15, passed: pts >= 9,
+      section: 'schreiben', correct: t1ok, total: hasT1 ? fields.length : 0,
+      points: pts, maxPoints: effectiveMax, passed: pts >= effectiveMax * 0.6,
     };
   }
 

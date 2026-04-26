@@ -262,14 +262,20 @@ export const tests: TelcTest[] = [
     },
     schreiben: {
       teil1: {
-        instruction: "Sie möchten sich für einen Deutschkurs anmelden. Füllen Sie das Formular aus.",
+        instruction: "Lesen Sie die Informationen über die Person. Füllen Sie das Anmeldeformular für sie aus.",
         formTitle: "Anmeldung Deutschkurs",
+        personCard: [
+          "Name:         Maria Schmidt",
+          "Geburtstag:   15.03.1992",
+          "Adresse:      Schillerstraße 14, 80336 München",
+          "Telefon:      089-4567890",
+        ],
         fields: [
-          { label: "Vorname", answer: "", hint: "Ihr Vorname" },
-          { label: "Nachname", answer: "", hint: "Ihr Nachname" },
-          { label: "Geburtsdatum", answer: "", hint: "z.B. 15.03.1995" },
-          { label: "Adresse", answer: "", hint: "Straße, Hausnummer, PLZ, Stadt" },
-          { label: "Telefonnummer", answer: "", hint: "Ihre Telefonnummer" },
+          { label: "Vorname",      answer: "Maria",                               hint: "Vorname der Person" },
+          { label: "Nachname",     answer: "Schmidt",                             hint: "Nachname der Person" },
+          { label: "Geburtsdatum", answer: "15.03.1992",                         hint: "z.B. 15.03.1992" },
+          { label: "Adresse",      answer: "Schillerstraße 14, 80336 München",   hint: "Straße, PLZ, Stadt" },
+          { label: "Telefon",      answer: "089-4567890",                        hint: "Telefonnummer" },
         ],
       },
       teil2: {
@@ -564,14 +570,21 @@ export const tests: TelcTest[] = [
     },
     schreiben: {
       teil1: {
-        instruction: "Sie möchten ein Hotelzimmer reservieren. Füllen Sie das Formular aus.",
-        formTitle: "Hotel Reservation",
+        instruction: "Lesen Sie die Informationen über die Person. Füllen Sie das Hotelformular für sie aus.",
+        formTitle: "Hotelreservierung",
+        personCard: [
+          "Name:      Thomas Bauer",
+          "E-Mail:    t.bauer@email.de",
+          "Anreise:   10.07.2025",
+          "Abreise:   14.07.2025",
+          "Zimmer:    Doppelzimmer",
+        ],
         fields: [
-          { label: "Name", answer: "", hint: "Ihr voller Name" },
-          { label: "Anreise (Datum)", answer: "", hint: "z.B. 10.07.2025" },
-          { label: "Abreise (Datum)", answer: "", hint: "z.B. 15.07.2025" },
-          { label: "Zimmertyp", answer: "", hint: "Einzelzimmer / Doppelzimmer" },
-          { label: "E-Mail", answer: "", hint: "Ihre E-Mail-Adresse" },
+          { label: "Name",           answer: "Thomas Bauer",       hint: "Vollständiger Name" },
+          { label: "Anreise",        answer: "10.07.2025",         hint: "z.B. 10.07.2025" },
+          { label: "Abreise",        answer: "14.07.2025",         hint: "z.B. 14.07.2025" },
+          { label: "Zimmertyp",      answer: "Doppelzimmer",       hint: "Einzelzimmer / Doppelzimmer" },
+          { label: "E-Mail",         answer: "t.bauer@email.de",   hint: "E-Mail-Adresse" },
         ],
       },
       teil2: {
@@ -865,14 +878,22 @@ export const tests: TelcTest[] = [
     },
     schreiben: {
       teil1: {
-        instruction: "Sie möchten sich bei einer Firma bewerben. Füllen Sie das Formular aus.",
-        formTitle: "Bewerbung - Personliche Daten",
+        instruction: "Lesen Sie die Informationen über die Person. Füllen Sie das Bewerbungsformular für sie aus.",
+        formTitle: "Bewerbung — Persönliche Daten",
+        personCard: [
+          "Name:              Fatima Yilmaz",
+          "Geburtsdatum:      22.08.1988",
+          "Geburtsort:        Ankara",
+          "Staatsangehörigkeit: türkisch",
+          "Beruf:             Verkäuferin",
+          "Deutschkenntnisse: A1",
+        ],
         fields: [
-          { label: "Vor- und Nachname", answer: "", hint: "Ihr voller Name" },
-          { label: "Geburtsdatum und -ort", answer: "", hint: "z.B. 15.03.1990, Ankara" },
-          { label: "Staatsangehörigkeit", answer: "", hint: "z.B. türkisch" },
-          { label: "Beruf / Ausbildung", answer: "", hint: "z.B. Verkaufer/in" },
-          { label: "Deutschkenntnisse", answer: "", hint: "z.B. A1, Grundkenntnisse" },
+          { label: "Vor- und Nachname",      answer: "Fatima Yilmaz",     hint: "Vollständiger Name" },
+          { label: "Geburtsdatum und -ort",  answer: "22.08.1988, Ankara", hint: "z.B. 22.08.1988, Ankara" },
+          { label: "Staatsangehörigkeit",    answer: "türkisch",           hint: "z.B. deutsch, türkisch" },
+          { label: "Beruf / Ausbildung",     answer: "Verkäuferin",        hint: "z.B. Verkäufer/in" },
+          { label: "Deutschkenntnisse",      answer: "A1",                 hint: "z.B. A1, A2" },
         ],
       },
       teil2: {
