@@ -1,0 +1,518 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Primary brand ─────────────────────────────────── */
+  --color-telc: #00b84d;
+  --color-telc-dark: #009640;
+  --color-telc-darker: #007a33;
+  --color-telc-light: #dcfce7;
+  --color-telc-glow: rgba(0, 184, 77, 0.15);
+
+  /* ── Section colors (vibrant, Duolingo-inspired) ──── */
+  --color-section-hoeren: #3b82f6;
+  --color-section-hoeren-dark: #2563eb;
+  --color-section-hoeren-light: #dbeafe;
+  --color-section-lesen: #f59e0b;
+  --color-section-lesen-dark: #d97706;
+  --color-section-lesen-light: #fef3c7;
+  --color-section-schreiben: #8b5cf6;
+  --color-section-schreiben-dark: #7c3aed;
+  --color-section-schreiben-light: #ede9fe;
+  --color-section-sprechen: #00b84d;
+  --color-section-sprechen-dark: #009640;
+  --color-section-sprechen-light: #dcfce7;
+
+  /* ── Semantic ──────────────────────────────────────── */
+  --color-correct: #22c55e;
+  --color-correct-dark: #16a34a;
+  --color-wrong: #ef4444;
+  --color-wrong-dark: #dc2626;
+  --color-exam-bg: #f0f4f8;
+  --color-card: #ffffff;
+  --color-card-border: #e2e8f0;
+  --color-card-hover: #f8fafc;
+
+  /* ── Radius ────────────────────────────────────────── */
+  --radius-card: 16px;
+  --radius-button: 14px;
+  --radius-pill: 9999px;
+  --radius-input: 12px;
+}
+
+/* ── Global ──────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&display=swap');
+
+html {
+  font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-exam-bg);
+  color: #1e293b;
+  min-height: 100dvh;
+}
+
+/* ── CURSOR FIX — every interactive element gets pointer ─ */
+button,
+label,
+[role="button"],
+input[type="radio"],
+input[type="checkbox"],
+.option-card,
+.word-card,
+.rf-toggle button,
+a {
+  cursor: pointer !important;
+}
+
+/* ── Selection color ─────────────────────────────────── */
+::selection {
+  background: var(--color-telc-glow);
+  color: inherit;
+}
+
+/* ═══════════════════════════════════════════════════════
+   3D BUTTONS (Duolingo-style)
+   ═══════════════════════════════════════════════════════ */
+
+.btn-3d {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  border: none;
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  transform: translateY(0);
+  user-select: none;
+}
+
+/* Primary (green) */
+.btn-3d-primary {
+  background: var(--color-telc);
+  color: white;
+  box-shadow: 0 4px 0 0 var(--color-telc-darker),
+              0 6px 12px rgba(0, 0, 0, 0.1);
+}
+.btn-3d-primary:hover {
+  background: #00c853;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 0 var(--color-telc-darker),
+              0 8px 16px rgba(0, 0, 0, 0.12);
+}
+.btn-3d-primary:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 var(--color-telc-darker),
+              0 2px 4px rgba(0, 0, 0, 0.08);
+}
+.btn-3d-primary:disabled {
+  background: #94a3b8;
+  box-shadow: 0 4px 0 0 #64748b, 0 6px 12px rgba(0, 0, 0, 0.05);
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
+/* Secondary (outline) */
+.btn-3d-secondary {
+  background: white;
+  color: #475569;
+  border: 2.5px solid #e2e8f0;
+  box-shadow: 0 4px 0 0 #cbd5e1,
+              0 6px 12px rgba(0, 0, 0, 0.04);
+}
+.btn-3d-secondary:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 0 #cbd5e1,
+              0 8px 16px rgba(0, 0, 0, 0.06);
+}
+.btn-3d-secondary:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 #cbd5e1;
+}
+
+/* Blue */
+.btn-3d-blue {
+  background: var(--color-section-hoeren);
+  color: white;
+  box-shadow: 0 4px 0 0 var(--color-section-hoeren-dark),
+              0 6px 12px rgba(0, 0, 0, 0.1);
+}
+.btn-3d-blue:hover {
+  background: #60a5fa;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 0 var(--color-section-hoeren-dark),
+              0 8px 16px rgba(0, 0, 0, 0.12);
+}
+.btn-3d-blue:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 var(--color-section-hoeren-dark);
+}
+
+/* Danger (red) */
+.btn-3d-danger {
+  background: var(--color-wrong);
+  color: white;
+  box-shadow: 0 4px 0 0 var(--color-wrong-dark),
+              0 6px 12px rgba(0, 0, 0, 0.1);
+}
+.btn-3d-danger:hover {
+  background: #f87171;
+  transform: translateY(-1px);
+}
+.btn-3d-danger:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 var(--color-wrong-dark);
+}
+
+/* ═══════════════════════════════════════════════════════
+   CARDS
+   ═══════════════════════════════════════════════════════ */
+
+.card {
+  background: var(--color-card);
+  border: 2px solid var(--color-card-border);
+  border-radius: var(--radius-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04),
+              0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.card-interactive {
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+}
+.card-interactive:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08),
+              0 2px 4px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+}
+.card-interactive:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* ═══════════════════════════════════════════════════════
+   OPTION CARDS (quiz answers)
+   ═══════════════════════════════════════════════════════ */
+
+.option-card {
+  background: white;
+  border: 2.5px solid #e2e8f0;
+  border-radius: var(--radius-button);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  cursor: pointer !important;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.option-card:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  transform: translateX(4px);
+}
+.option-card.selected {
+  border-color: var(--color-telc);
+  background: var(--color-telc-light);
+  box-shadow: 0 0 0 3px var(--color-telc-glow);
+}
+.option-card.selected-blue {
+  border-color: var(--color-section-hoeren);
+  background: var(--color-section-hoeren-light);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.option-card.selected-amber {
+  border-color: var(--color-section-lesen);
+  background: var(--color-section-lesen-light);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+/* ═══════════════════════════════════════════════════════
+   RICHTIG / FALSCH TOGGLE
+   ═══════════════════════════════════════════════════════ */
+
+.rf-toggle {
+  display: inline-flex;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  border: 2.5px solid #e2e8f0;
+  background: white;
+}
+.rf-toggle button {
+  padding: 0.625rem 1.75rem;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  transition: all 0.15s ease;
+  background: white;
+  color: #94a3b8;
+  border: none;
+  cursor: pointer !important;
+}
+.rf-toggle button:first-child {
+  border-right: 2px solid #e2e8f0;
+}
+.rf-toggle button:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+.rf-toggle button.active-richtig {
+  background: var(--color-correct);
+  color: white;
+  box-shadow: inset 0 -3px 0 var(--color-correct-dark);
+}
+.rf-toggle button.active-falsch {
+  background: var(--color-wrong);
+  color: white;
+  box-shadow: inset 0 -3px 0 var(--color-wrong-dark);
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROGRESS BARS (thick, with animation)
+   ═══════════════════════════════════════════════════════ */
+
+.progress-track {
+  width: 100%;
+  height: 12px;
+  background: #e2e8f0;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 8px;
+  right: 8px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-pill);
+}
+
+/* ═══════════════════════════════════════════════════════
+   WORD CARDS (Sprechen Teil 2)
+   ═══════════════════════════════════════════════════════ */
+
+.word-card {
+  padding: 1rem 1.5rem;
+  border: 2.5px solid #e2e8f0;
+  border-radius: var(--radius-card);
+  text-align: center;
+  font-size: 1.125rem;
+  font-weight: 700;
+  background: white;
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 0 0 #e2e8f0;
+}
+.word-card:hover {
+  border-color: var(--color-telc);
+  background: var(--color-telc-light);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 0 var(--color-telc-dark);
+}
+.word-card.active {
+  border-color: var(--color-telc);
+  background: var(--color-telc-light);
+  box-shadow: 0 0 0 3px var(--color-telc-glow), 0 3px 0 0 var(--color-telc-dark);
+}
+
+/* ═══════════════════════════════════════════════════════
+   READING PANELS
+   ═══════════════════════════════════════════════════════ */
+
+.reading-panel {
+  background: #fefce8;
+  border: 2px solid #fde68a;
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  white-space: pre-line;
+  color: #1e293b;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SECTION STRIPS (teil labels)
+   ═══════════════════════════════════════════════════════ */
+
+.section-strip {
+  padding: 0.375rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RECORDING PULSE
+   ═══════════════════════════════════════════════════════ */
+
+@keyframes pulse-record {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { transform: scale(1.08); box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
+}
+.animate-pulse-record {
+  animation: pulse-record 1.5s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════
+   AUDIO WAVE
+   ═══════════════════════════════════════════════════════ */
+
+@keyframes wave {
+  0%, 100% { height: 6px; }
+  50% { height: 22px; }
+}
+.audio-wave span {
+  display: inline-block;
+  width: 4px;
+  margin: 0 2px;
+  background: currentColor;
+  border-radius: 2px;
+  animation: wave 0.8s ease-in-out infinite;
+}
+.audio-wave span:nth-child(2) { animation-delay: 0.1s; }
+.audio-wave span:nth-child(3) { animation-delay: 0.2s; }
+.audio-wave span:nth-child(4) { animation-delay: 0.3s; }
+.audio-wave span:nth-child(5) { animation-delay: 0.15s; }
+
+/* ═══════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════ */
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: fadeInUp 0.35s ease-out;
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.slide-in {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.9); opacity: 0; }
+  60% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.bounce-in {
+  animation: bounceIn 0.4s ease-out;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   TEXTAREA
+   ═══════════════════════════════════════════════════════ */
+
+textarea {
+  resize: vertical;
+  border-radius: var(--radius-input);
+}
+textarea::-webkit-scrollbar {
+  width: 6px;
+}
+textarea::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   INPUT FIELDS
+   ═══════════════════════════════════════════════════════ */
+
+input[type="text"],
+input[type="email"],
+input[type="search"],
+textarea {
+  border: 2.5px solid #e2e8f0;
+  border-radius: var(--radius-input);
+  transition: all 0.15s ease;
+}
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="search"]:focus,
+textarea:focus {
+  border-color: var(--color-telc);
+  box-shadow: 0 0 0 3px var(--color-telc-glow);
+  outline: none;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RADIO BUTTONS (custom)
+   ═══════════════════════════════════════════════════════ */
+
+input[type="radio"] {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid #cbd5e1;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+input[type="radio"]:checked {
+  border-color: var(--color-telc);
+  background: var(--color-telc);
+}
+input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLLBAR (subtle)
+   ═══════════════════════════════════════════════════════ */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

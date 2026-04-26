@@ -1,0 +1,223 @@
+import { useState } from 'react';
+import type { LesenTeil, Answer, Teil } from '../types';
+import { ChevronRight, BookOpen } from 'lucide-react';
+import { Timer } from './Timer';
+import { AnswerFeedback } from './AnswerFeedback';
+
+interface LesenProps {
+  data: { teil1: LesenTeil; teil2: LesenTeil; teil3: LesenTeil };
+  teile?: Teil[] | null;
+  practice?: boolean;
+  onComplete: (answers: Answer[]) => void;
+}
+
+const ALL_TEILE: Teil[] = ['teil1', 'teil2', 'teil3'];
+const TEIL_LABELS: Record<string, string> = { teil1: 'Teil 1', teil2: 'Teil 2', teil3: 'Teil 3' };
+
+function optionValue(opt: string): string {
+  const m = opt.match(/^([a-c])\)/);
+  return m ? m[1] : opt;
+}
+
+function getCorrectLabel(item: { correct: string; options: string[] }): string {
+  if (item.correct === 'richtig' || item.correct === 'falsch') return item.correct;
+  const opt = item.options.find(o => optionValue(o) === item.correct);
+  return opt || item.correct;
+}
+
+const LESEN_TIME = 25 * 60;
+
+export function Lesen({ data, teile, practice, onComplete }: LesenProps) {
+  const TEILE = teile && teile.length > 0 ? teile : ALL_TEILE;
+  const [teilIdx, setTeilIdx] = useState(0);
+  const [itemIdx, setItemIdx] = useState(0);
+  const [phase, setPhase] = useState<'instruction' | 'item' | 'feedback'>('instruction');
+  const [answers, setAnswers] = useState<Answer[]>([]);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [lastCorrect, setLastCorrect] = useState(false);
+  const [lastCorrectAnswer, setLastCorrectAnswer] = useState('');
+  const [pendingAnswers, setPendingAnswers] = useState<Answer[]>([]);
+
+  const teil = TEILE[teilIdx];
+  const teilData = data[teil];
+  const item = teilData.items[itemIdx];
+  const totalItems = TEILE.reduce((sum, t) => sum + data[t].items.length, 0);
+  const completedItems = TEILE.slice(0, teilIdx).reduce((sum, t) => sum + data[t].items.length, 0) + itemIdx;
+
+  const isRichtigFalsch = item?.options.length === 2
+    && item.options.includes('richtig')
+    && item.options.includes('falsch');
+
+  function handleNext() {
+    if (selected === null) return;
+
+    const newAnswer: Answer = {
+      section: 'lesen', teil, itemId: item.id, value: selected,
+    };
+    const updated = [...answers, newAnswer];
+
+    if (practice) {
+      setLastCorrect(selected === item.correct);
+      setLastCorrectAnswer(getCorrectLabel(item));
+      setPendingAnswers(updated);
+      setPhase('feedback');
+    } else {
+      advance(updated);
+    }
+  }
+
+  function handleFeedbackContinue() {
+    advance(pendingAnswers);
+  }
+
+  function advance(updated: Answer[]) {
+    if (itemIdx < teilData.items.length - 1) {
+      setAnswers(updated);
+      setItemIdx(i => i + 1);
+      setSelected(null);
+      setPhase('item');
+    } else if (teilIdx < TEILE.length - 1) {
+      setAnswers(updated);
+      setTeilIdx(t => t + 1);
+      setItemIdx(0);
+      setSelected(null);
+      setPhase('instruction');
+    } else {
+      onComplete(updated);
+    }
+  }
+
+  function handleTimeUp() {
+    const rest: Answer[] = [];
+    for (let t = teilIdx; t < TEILE.length; t++) {
+      const td = data[TEILE[t]];
+      const startI = t === teilIdx ? itemIdx : 0;
+      for (let i = startI; i < td.items.length; i++) {
+        const existing = answers.find(a => a.teil === TEILE[t] && a.itemId === td.items[i].id);
+        if (!existing) {
+          rest.push({ section: 'lesen', teil: TEILE[t], itemId: td.items[i].id, value: '' });
+        }
+      }
+    }
+    onComplete([...answers, ...rest]);
+  }
+
+  // ── Instruction ─────────────────────────────────────────────────
+  if (phase === 'instruction') {
+    return (
+      <div className="max-w-2xl mx-auto p-6 fade-in">
+        <div className="card !rounded-2xl p-8 text-center">
+          <div className="section-strip bg-section-lesen-light text-section-lesen-dark mb-6">
+            <BookOpen size={14} />
+            Lesen — {TEIL_LABELS[teil]}
+          </div>
+          <p className="text-gray-700 text-lg leading-relaxed mb-8 max-w-lg mx-auto">
+            {teilData.instruction}
+          </p>
+          <button
+            onClick={() => setPhase('item')}
+            className="btn-3d btn-3d-primary"
+          >
+            Starten <ChevronRight size={18} className="inline ml-1" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Item ────────────────────────────────────────────────────────
+  return (
+    <div className="max-w-2xl mx-auto p-6 fade-in">
+      {/* Header with timer */}
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-semibold">
+          <span className="text-section-lesen-dark">Lesen</span> — {TEIL_LABELS[teil]} — Aufgabe {itemIdx + 1}/{teilData.items.length}
+        </span>
+        <Timer seconds={LESEN_TIME} onExpired={handleTimeUp} paused={phase === 'feedback'} />
+      </div>
+      <div className="progress-track mb-6">
+        <div
+          className="progress-fill bg-section-lesen"
+          style={{ width: `${((completedItems + 1) / totalItems) * 100}%` }}
+        />
+      </div>
+
+      <div className="card !rounded-2xl p-6 md:p-8 space-y-5">
+        {/* Reading text panel */}
+        <div className="reading-panel">
+          {item.text}
+        </div>
+
+        {/* Question */}
+        <div className="font-bold text-lg pt-1">{item.question}</div>
+
+        {/* Options: richtig/falsch toggle OR regular radio cards */}
+        {isRichtigFalsch ? (
+          <div className="flex justify-center py-2">
+            <div className="rf-toggle">
+              <button
+                type="button"
+                onClick={() => phase !== 'feedback' && setSelected('richtig')}
+                className={selected === 'richtig' ? 'active-richtig' : ''}
+              >
+                Richtig
+              </button>
+              <button
+                type="button"
+                onClick={() => phase !== 'feedback' && setSelected('falsch')}
+                className={selected === 'falsch' ? 'active-falsch' : ''}
+              >
+                Falsch
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {item.options.map((opt) => {
+              const val = optionValue(opt);
+              const isSelected = selected === val;
+              return (
+                <label
+                  key={opt}
+                  onClick={() => phase !== 'feedback' && setSelected(val)}
+                  className={`option-card ${isSelected ? 'selected-amber' : ''}`}
+                >
+                  <input
+                    type="radio"
+                    name="lesen-answer"
+                    value={val}
+                    checked={isSelected}
+                    onChange={() => phase !== 'feedback' && setSelected(val)}
+                  />
+                  <span className={isSelected ? 'font-bold' : ''}>{opt}</span>
+                </label>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Next (hide during feedback) */}
+        {phase !== 'feedback' && (
+          <div className="flex justify-end pt-2">
+            <button
+              onClick={handleNext}
+              disabled={selected === null}
+              className="btn-3d btn-3d-primary"
+            >
+              Weiter <ChevronRight size={18} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Feedback banner */}
+      {phase === 'feedback' && (
+        <AnswerFeedback
+          isCorrect={lastCorrect}
+          correctAnswer={lastCorrectAnswer}
+          onContinue={handleFeedbackContinue}
+        />
+      )}
+    </div>
+  );
+}
