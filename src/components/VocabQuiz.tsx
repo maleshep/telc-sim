@@ -3,6 +3,7 @@ import { studyData } from '../study-data';
 import { ArrowLeft, Zap } from 'lucide-react';
 import { TopicPicker } from './Flashcards';
 import { AnswerFeedback } from './AnswerFeedback';
+import { markKnown, trackLookedUp } from '../vocabTracking';
 
 interface VocabQuizProps {
   onBack: () => void;
@@ -78,8 +79,10 @@ export function VocabQuiz({ onBack }: VocabQuizProps) {
         setMaxStreak(m => Math.max(m, next));
         return next;
       });
+      markKnown(question.german);
     } else {
       setStreak(0);
+      trackLookedUp(question.german); // wrong answer = saw the correct answer = worth tracking
     }
     setShowFeedback(true);
   }
@@ -109,8 +112,8 @@ export function VocabQuiz({ onBack }: VocabQuizProps) {
   keyHandlerRef.current = (e: KeyboardEvent) => {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
     if (finished || !question) return;
-    if (showFeedback) return; // AnswerFeedback handles Enter
-    if (e.key === 'Enter' && selected !== null) { handleContinue(); return; }
+    if (showFeedback) return; // AnswerFeedback handles Enter in feedback phase
+    if (e.key === 'Enter' && selected !== null) { handleSelect(selected); return; }
     const num = parseInt(e.key);
     if (!isNaN(num) && num >= 1 && num <= question.options.length) {
       handleSelect(question.options[num - 1]);

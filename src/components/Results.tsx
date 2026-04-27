@@ -59,12 +59,13 @@ function SectionCard({ score }: { score: SectionScore }) {
 
       <div className="flex justify-between text-sm">
         <span className="text-gray-500 font-medium">
-          {score.correct !== undefined && score.total !== undefined && score.total > 0
+          {score.section !== 'schreiben' && score.section !== 'sprechen'
+            && score.total !== undefined && score.total > 0
             ? `${score.correct}/${score.total} richtig`
             : ''}
         </span>
         <span className="font-extrabold">
-          {score.points.toFixed(1)} / {score.maxPoints} Pkt.
+          {Number.isInteger(score.points) ? score.points : score.points.toFixed(1)} / {score.maxPoints} Pkt.
         </span>
       </div>
     </div>
@@ -124,17 +125,25 @@ export function Results({ result, mode = 'exam', onRestart, onHome }: ResultsPro
           <div className="text-sm text-gray-500 mt-1 font-medium">
             {isPractice
               ? `${totalPct}% — Bestehensgrenze für diese Sektion: 60%`
-              : `${totalPct}% — Bestehensgrenze: 60% (36/60 Punkte)`
+              : `${totalPct}% — Bestehensgrenze: 60% (${Math.round(result.maxPoints * 0.6)}/${result.maxPoints} Punkte)`
             }
           </div>
         </div>
 
         {/* Section breakdown */}
-        <div className={result.sections.length === 1 ? '' : 'grid grid-cols-1 sm:grid-cols-2 gap-4'}>
+        <div className={result.sections.length === 1 ? 'max-w-md mx-auto' : 'grid grid-cols-1 sm:grid-cols-2 gap-4'}>
           {result.sections.map(score => (
             <SectionCard key={score.section} score={score} />
           ))}
         </div>
+
+        {/* Schreiben feedback */}
+        {result.schreibenFeedback && (
+          <div className="card !rounded-2xl p-6">
+            <h3 className="font-bold mb-2 text-section-schreiben">Feedback — Schreiben</h3>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-line">{result.schreibenFeedback}</p>
+          </div>
+        )}
 
         {/* Sprechen feedback */}
         {result.sprechenFeedback && (

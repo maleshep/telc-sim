@@ -3,8 +3,9 @@ import type { VocabTopic, GrammarRule } from '../study-data';
 import { studyData } from '../study-data';
 import {
   BookOpen, Languages, ChevronRight, ChevronDown,
-  ArrowLeft, Search, Gamepad2, CreditCard, HelpCircle,
+  ArrowLeft, Search, Gamepad2, CreditCard, HelpCircle, Star,
 } from 'lucide-react';
+import { getStats } from '../vocabTracking';
 import { Flashcards } from './Flashcards';
 import { VocabQuiz } from './VocabQuiz';
 
@@ -100,8 +101,24 @@ function GamesView({ onFlashcards, onQuiz }: {
   onFlashcards: () => void;
   onQuiz: () => void;
 }) {
+  const stats = getStats();
   return (
     <div className="space-y-4 fade-in">
+      {/* Vocab progress banner */}
+      {(stats.lookedUp > 0 || stats.known > 0) && (
+        <div className="card !rounded-2xl p-4 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-telc/10 flex items-center justify-center shrink-0">
+            <Star size={20} className="text-telc" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Dein Fortschritt</div>
+            <div className="flex gap-4">
+              <span className="text-sm font-bold text-correct">{stats.known} gelernt</span>
+              <span className="text-sm font-bold text-section-hoeren">{stats.lookedUp} nachgeschlagen</span>
+            </div>
+          </div>
+        </div>
+      )}
       <p className="text-sm text-gray-500 font-medium">
         Lerne spielerisch! Wähle eine Aktivität:
       </p>

@@ -29,13 +29,31 @@ const AZURE_SPEECH_BASE = import.meta.env.DEV
 function hasOpenAITTS(): boolean {
   return !!(OPENAI_BASE && OPENAI_KEY);
 }
+function hasOpenAISTT(): boolean {
+  return !!(OPENAI_BASE && OPENAI_KEY);
+}
 function hasAzureTTS(): boolean {
   return !!(AZURE_SPEECH_KEY && AZURE_SPEECH_BASE);
 }
 
 // ── Audio cache + state ───────────────────────────────────────────
 
-const audioCache = new Map<string, string>(); // cacheKey → objectURL
+const AUDIO_CACHE_MAX = 30;
+const audioCache = new Map<string, string>(); // cacheKey → objectURL (LRU, capped at AUDIO_CACHE_MAX)
+
+function setCacheEntry(key: string, url: string): void {
+  if (audioCache.has(key)) {
+    audioCache.delete(key); // re-insert to refresh LRU position
+  } else if (audioCache.size >= AUDIO_CACHE_MAX) {
+    // Evict oldest entry and revoke its object URL to free memory
+    const oldest = audioCache.keys().next().value;
+    if (oldest !== undefined) {
+      URL.revokeObjectURL(audioCache.get(oldest)!);
+      audioCache.delete(oldest);
+    }
+  }
+  audioCache.set(key, url);
+}
 let currentAudio: HTMLAudioElement | null = null;
 let usingFallback = false;
 
@@ -62,7 +80,7 @@ export async function speak(
       } else {
         throw new Error('no API TTS configured');
       }
-      audioCache.set(cacheKey, objectUrl);
+      setCacheEntry(cacheKey, objectUrl);
     } catch (err) {
       console.warn('API TTS failed, falling back to browser:', err);
       usingFallback = true;
@@ -312,7 +330,7 @@ function listenBrowser(lang = 'de-DE', timeoutMs = 20000): Promise<string> {
  * Main listen entry point — tries Whisper if configured, falls back to browser STT.
  */
 export async function listen(lang = 'de-DE', timeoutMs = 20000): Promise<string> {
-  if (hasOpenAITTS()) {
+  if (hasOpenAISTT()) {
     try {
       return await listenWhisper(lang, timeoutMs);
     } catch (err) {
@@ -323,5 +341,5 @@ export async function listen(lang = 'de-DE', timeoutMs = 20000): Promise<string>
 }
 
 export function isSTTAvailable(): boolean {
-  return hasOpenAITTS() || getBrowserSpeechRecognition() !== null;
+  return hasOpenAISTT() || getBrowserSpeechRecognition() !== null;
 }

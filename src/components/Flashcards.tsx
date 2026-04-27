@@ -5,6 +5,7 @@ import {
   ArrowLeft, RotateCcw, ChevronLeft, ChevronRight,
   CheckCircle, Shuffle, Eye,
 } from 'lucide-react';
+import { markKnown as persistMarkKnown } from '../vocabTracking';
 
 interface FlashcardsProps {
   onBack: () => void;
@@ -50,6 +51,7 @@ export function Flashcards({ onBack }: FlashcardsProps) {
 
   function markKnown() {
     setKnown(prev => new Set([...prev, cardIdx]));
+    if (card) persistMarkKnown(card.german);
     nextCard();
   }
 

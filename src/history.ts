@@ -14,11 +14,26 @@ export function loadHistory(): HistoryEntry[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
-    const entries = JSON.parse(raw) as HistoryEntry[];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
     // Back-fill type for entries saved before this field existed
-    return entries.map(e => ({ ...e, type: e.type ?? 'exam' }));
+    return (parsed as HistoryEntry[]).map(e => ({ ...e, type: e.type ?? 'exam' }));
   } catch {
     return [];
+  }
+}
+
+function persist(history: HistoryEntry[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  } catch (err) {
+    // QuotaExceededError: prune oldest entries and retry once
+    if (history.length > 10) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history.slice(0, 10)));
+      } catch { /* give up gracefully */ }
+    }
+    console.warn('History save failed:', err);
   }
 }
 
@@ -31,7 +46,7 @@ export function saveResult(result: ExamResult): HistoryEntry {
   };
   const history = loadHistory();
   history.unshift(entry);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  persist(history);
   return entry;
 }
 
@@ -45,7 +60,7 @@ export function savePracticeResult(result: ExamResult, section: Section): Histor
   };
   const history = loadHistory();
   history.unshift(entry);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  persist(history);
   return entry;
 }
 

@@ -88,12 +88,15 @@ function App() {
     const section = screen as Section;
     let score: SectionScore;
 
+    let schreibenFeedback: string | undefined;
     if (section === 'hoeren' || section === 'lesen') {
       score = scoreMC(section, newAnswers);
     } else {
       // schreiben — async LLM scoring
       setScreen('scoring');
-      score = await scoreSchreibenFn(newAnswers);
+      const result = await scoreSchreibenFn(newAnswers);
+      score = result.score;
+      schreibenFeedback = result.feedback || undefined;
     }
 
     const practiceResult: ExamResult = {
@@ -102,6 +105,7 @@ function App() {
       totalPoints: score.points,
       maxPoints: score.maxPoints,
       passed: score.passed,
+      schreibenFeedback,
     };
     savePracticeResult(practiceResult, section);
     setResult(practiceResult);
@@ -110,46 +114,52 @@ function App() {
 
   async function handleSprechenDone(conversation: ChatMessage[]) {
     setScreen('scoring');
-    const spResult = await scoreSprechenFn(conversation);
+    try {
+      const spResult = await scoreSprechenFn(conversation);
 
-    const spScore: SectionScore = {
-      section: 'sprechen', correct: 0, total: 0,
-      points: spResult.score, maxPoints: 15,
-      passed: spResult.score >= 9,
-    };
-
-    if (mode === 'practice') {
-      const practiceResult: ExamResult = {
-        testId: test.id,
-        sections: [spScore],
-        totalPoints: spScore.points,
-        maxPoints: spScore.maxPoints,
-        passed: spScore.passed,
-        sprechenFeedback: spResult.feedback,
+      const spScore: SectionScore = {
+        section: 'sprechen', correct: 0, total: 0,
+        points: spResult.score, maxPoints: 15,
+        passed: spResult.score >= 9,
       };
-      savePracticeResult(practiceResult, 'sprechen');
-      setResult(practiceResult);
+
+      if (mode === 'practice') {
+        const practiceResult: ExamResult = {
+          testId: test.id,
+          sections: [spScore],
+          totalPoints: spScore.points,
+          maxPoints: spScore.maxPoints,
+          passed: spScore.passed,
+          sprechenFeedback: spResult.feedback,
+        };
+        savePracticeResult(practiceResult, 'sprechen');
+        setResult(practiceResult);
+        setScreen('results');
+        return;
+      }
+
+      // Full exam: score all sections together
+      const all = answersRef.current;
+      const hScore = scoreMC('hoeren', all);
+      const lScore = scoreMC('lesen', all);
+      const { score: sScore, feedback: schreibenFeedback } = await scoreSchreibenFn(all);
+      const sections = [hScore, lScore, sScore, spScore];
+      const totalPoints = sections.reduce((s, sec) => s + sec.points, 0);
+      const maxPoints = sections.reduce((s, sec) => s + sec.maxPoints, 0);
+
+      const examResult: ExamResult = {
+        testId: test.id, sections, totalPoints, maxPoints,
+        passed: totalPoints >= maxPoints * 0.6 && sections.every(s => s.passed),
+        sprechenFeedback: spResult.feedback,
+        schreibenFeedback: schreibenFeedback || undefined,
+      };
+      saveResult(examResult);
+      setResult(examResult);
       setScreen('results');
-      return;
+    } catch (err) {
+      console.error('Sprechen scoring failed:', err);
+      setScreen('home');
     }
-
-    // Full exam: score all sections together
-    const all = answersRef.current;
-    const hScore = scoreMC('hoeren', all);
-    const lScore = scoreMC('lesen', all);
-    const sScore = await scoreSchreibenFn(all);
-    const sections = [hScore, lScore, sScore, spScore];
-    const totalPoints = sections.reduce((s, sec) => s + sec.points, 0);
-    const maxPoints = sections.reduce((s, sec) => s + sec.maxPoints, 0);
-
-    const examResult: ExamResult = {
-      testId: test.id, sections, totalPoints, maxPoints,
-      passed: totalPoints >= maxPoints * 0.6 && sections.every(s => s.passed),
-      sprechenFeedback: spResult.feedback,
-    };
-    saveResult(examResult);
-    setResult(examResult);
-    setScreen('results');
   }
 
   function goHome() {
@@ -159,13 +169,22 @@ function App() {
 
   function handleAbandon() {
     setAbandonConfirm(false);
-    goHome();
+    if (mode === 'practice') {
+      setScreen('section-picker');
+    } else {
+      goHome();
+    }
   }
 
   function restartPractice() {
     answersRef.current = [];
     setResult(null);
-    setScreen('section-picker');
+    // If Teile were pre-selected, skip the picker and go straight back
+    if (practiceTeile !== null) {
+      setScreen(practiceSection);
+    } else {
+      setScreen('section-picker');
+    }
   }
 
   // ── Scoring helpers ─────────────────────────────────────────────
@@ -196,13 +215,14 @@ function App() {
     return { section, correct, total, points: correct, maxPoints: total, passed: total > 0 && correct >= total * 0.6 };
   }
 
-  async function scoreSchreibenFn(allAnswers: Answer[]): Promise<SectionScore> {
+  async function scoreSchreibenFn(allAnswers: Answer[]): Promise<{ score: SectionScore; feedback: string }> {
     const hasT1 = allAnswers.some(a => a.section === 'schreiben' && a.teil === 'teil1');
     const hasT2 = allAnswers.some(a => a.section === 'schreiben' && a.teil === 'teil2');
 
     let pts = 0;
     let maxPts = 0;
     let t1ok = 0;
+    let feedback = '';
     const fields = test.schreiben.teil1.fields;
 
     if (hasT1) {
@@ -220,11 +240,17 @@ function App() {
       maxPts += 10;
       const textAns = allAnswers.find(a => a.section === 'schreiben' && a.teil === 'teil2')?.value || '';
       if (isLLMConfigured() && textAns.trim()) {
-        const r = await evaluateSchreiben(
-          test.schreiben.teil2.situation, test.schreiben.teil2.bullets,
-          textAns, test.schreiben.teil2.minWords,
-        );
-        pts += Math.min(10, r.score);
+        try {
+          const r = await evaluateSchreiben(
+            test.schreiben.teil2.situation, test.schreiben.teil2.bullets,
+            textAns, test.schreiben.teil2.minWords,
+          );
+          pts += Math.min(10, r.score);
+          feedback = r.feedback || '';
+        } catch {
+          const wc = textAns.trim().split(/\s+/).filter(Boolean).length;
+          pts += Math.round(Math.min(1, wc / Math.max(1, test.schreiben.teil2.minWords)) * 10);
+        }
       } else {
         const wc = textAns.trim().split(/\s+/).filter(Boolean).length;
         pts += Math.round(Math.min(1, wc / Math.max(1, test.schreiben.teil2.minWords)) * 10);
@@ -234,8 +260,11 @@ function App() {
     const effectiveMax = maxPts || 15;
     pts = Math.round(pts * 10) / 10;
     return {
-      section: 'schreiben', correct: t1ok, total: hasT1 ? fields.length : 0,
-      points: pts, maxPoints: effectiveMax, passed: pts >= effectiveMax * 0.6,
+      score: {
+        section: 'schreiben', correct: t1ok, total: hasT1 ? fields.length : 0,
+        points: pts, maxPoints: effectiveMax, passed: pts >= effectiveMax * 0.6,
+      },
+      feedback,
     };
   }
 
@@ -281,6 +310,11 @@ function App() {
 
   if (screen === 'history') {
     return <History onBack={goHome} />;
+  }
+
+  if (screen === 'results' && !result) {
+    setScreen('home');
+    return null;
   }
 
   if (screen === 'results' && result) {
@@ -354,9 +388,13 @@ function App() {
       {abandonConfirm && (
         <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4 fade-in">
-            <p className="font-extrabold text-gray-800 text-lg">Sitzung beenden?</p>
+            <p className="font-extrabold text-gray-800 text-lg">
+              {mode === 'practice' ? 'Übung beenden?' : 'Prüfung beenden?'}
+            </p>
             <p className="text-sm text-gray-500 leading-relaxed">
-              Dein Fortschritt in dieser Sektion geht verloren und wird nicht gespeichert.
+              {mode === 'practice'
+                ? 'Dein Fortschritt in dieser Übung geht verloren.'
+                : 'Dein Fortschritt in dieser Prüfung geht verloren und wird nicht gespeichert.'}
             </p>
             <div className="flex gap-3">
               <button

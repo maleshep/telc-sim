@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { SchreibenTeil1, SchreibenTeil2, Answer, Teil } from '../types';
 import { ChevronRight, PenTool, CheckCircle } from 'lucide-react';
 import { Timer } from './Timer';
@@ -14,10 +14,15 @@ const SCHREIBEN_TIME = 20 * 60; // 20 minutes
 export function Schreiben({ data, teile, onComplete }: SchreibenProps) {
   const hasTeil1 = !teile || teile.includes('teil1');
   const hasTeil2 = !teile || teile.includes('teil2');
-  const startPhase = hasTeil1 ? 'instruction1' : 'instruction2';
-  const [phase, setPhase] = useState<'instruction1' | 'form' | 'instruction2' | 'text'>(startPhase as any);
+  const startPhase: 'instruction1' | 'instruction2' = hasTeil1 ? 'instruction1' : 'instruction2';
+  const [phase, setPhase] = useState<'instruction1' | 'form' | 'instruction2' | 'text'>(startPhase);
   const [formValues, setFormValues] = useState<Record<number, string>>({});
   const [messageText, setMessageText] = useState('');
+  // Single clock for the whole Schreiben section — never remounted
+  const sectionStartRef = useRef<number>(Date.now());
+  function getRemainingSeconds(): number {
+    return Math.max(0, SCHREIBEN_TIME - Math.floor((Date.now() - sectionStartRef.current) / 1000));
+  }
 
   function handleFormField(idx: number, value: string) {
     setFormValues(prev => ({ ...prev, [idx]: value }));
@@ -50,7 +55,17 @@ export function Schreiben({ data, teile, onComplete }: SchreibenProps) {
   }
 
   function handleTimeUp() {
-    submitMessage();
+    // Build whatever answers exist at timeout and complete immediately
+    const answers: Answer[] = [];
+    if (hasTeil1) {
+      data.teil1.fields.forEach((_field, idx) => {
+        answers.push({ section: 'schreiben', teil: 'teil1', itemId: idx, value: formValues[idx] || '' });
+      });
+    }
+    if (hasTeil2) {
+      answers.push({ section: 'schreiben', teil: 'teil2', itemId: 0, value: messageText });
+    }
+    onComplete(answers);
   }
 
   const wordCount = messageText.trim().split(/\s+/).filter(Boolean).length;
@@ -87,7 +102,7 @@ export function Schreiben({ data, teile, onComplete }: SchreibenProps) {
           <span className="text-sm font-semibold">
             <span className="text-section-schreiben">Schreiben</span> — Teil 1
           </span>
-          <Timer seconds={SCHREIBEN_TIME} onExpired={handleTimeUp} />
+          <Timer seconds={getRemainingSeconds()} onExpired={handleTimeUp} />
         </div>
 
         {/* Person information card */}

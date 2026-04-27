@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { SprechenTeil, Teil } from '../types';
 import type { ChatMessage } from '../llm';
 import { speak, stopSpeaking, isSTTAvailable, listen } from '../speech';
@@ -12,7 +12,7 @@ interface SprechenProps {
 }
 
 const ALL_TEILE: Teil[] = ['teil1', 'teil2', 'teil3'];
-const TEIL_LABELS = ['Teil 1 — Sich vorstellen', 'Teil 2 — Über ein Thema sprechen', 'Teil 3 — Bitten formulieren'];
+const TEIL_LABELS = ['Teil 1 — Sich vorstellen', 'Teil 2 — Um etwas bitten', 'Teil 3 — Auf eine Bitte reagieren'];
 
 export function Sprechen({ data, teile, onComplete }: SprechenProps) {
   const TEILE = teile && teile.length > 0 ? teile : ALL_TEILE;
@@ -25,6 +25,10 @@ export function Sprechen({ data, teile, onComplete }: SprechenProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [manualInput, setManualInput] = useState('');
+  const convRef = useRef<ChatMessage[]>([]);
+
+  // Stop any playing audio when the component unmounts
+  useEffect(() => () => { stopSpeaking(); }, []);
 
   const teil = TEILE[teilIdx];
   const teilData = data[teil];
@@ -73,8 +77,10 @@ export function Sprechen({ data, teile, onComplete }: SprechenProps) {
       try {
         const followUp = await examinerFollowUp(teilIdx + 1, prompt, transcript);
         const examinerMsg: ChatMessage = { role: 'assistant', content: followUp };
+        const withExaminer = [...updated, examinerMsg];
         setExaminerText(followUp);
-        setConversation([...updated, examinerMsg]);
+        convRef.current = withExaminer;
+        setConversation(withExaminer);
         setIsSpeaking(true);
         try { await speak(followUp); } catch { /* ignore */ }
         setIsSpeaking(false);
@@ -83,6 +89,7 @@ export function Sprechen({ data, teile, onComplete }: SprechenProps) {
       } catch { /* fall through to next prompt */ }
     }
 
+    convRef.current = updated;
     setConversation(updated);
     advanceToNext(updated);
   }
@@ -105,7 +112,7 @@ export function Sprechen({ data, teile, onComplete }: SprechenProps) {
   }
 
   function handleExaminerDone() {
-    advanceToNext(conversation);
+    advanceToNext(convRef.current);
   }
 
   // ── Instruction ─────────────────────────────────────────────────

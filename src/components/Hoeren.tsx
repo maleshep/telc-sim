@@ -49,27 +49,34 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
     && item.options.includes('richtig')
     && item.options.includes('falsch');
 
-  // Keyboard shortcuts — always-fresh ref pattern avoids stale closures
+  // selectedRef stays in sync so Enter fires correctly even before React re-renders
+  const selectedRef = useRef<string | null>(null);
+  function pick(val: string | null) {
+    selectedRef.current = val;
+    setSelected(val);
+  }
+
   const keyHandlerRef = useRef<(e: KeyboardEvent) => void>(() => {});
   keyHandlerRef.current = (e: KeyboardEvent) => {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-    if (phase === 'feedback') return; // AnswerFeedback handles Enter in feedback phase
+    if (phase === 'feedback') return;
     if (phase === 'instruction') {
       if (e.key === 'Enter') { setPhase('item'); }
       return;
     }
     if (e.key === 'Enter') {
-      if (selected !== null && !isPlaying) handleNext();
+      const cur = selectedRef.current ?? selected;
+      if (cur !== null && !isPlaying) handleNext(cur);
       return;
     }
     const num = parseInt(e.key);
     if (isNaN(num) || num < 1) return;
     if (isRichtigFalsch) {
-      if (num === 1) setSelected('richtig');
-      if (num === 2) setSelected('falsch');
+      if (num === 1) pick('richtig');
+      if (num === 2) pick('falsch');
     } else {
       const vals = item.options.map(optionValue);
-      if (num <= vals.length) setSelected(vals[num - 1]);
+      if (num <= vals.length) pick(vals[num - 1]);
     }
   };
   useEffect(() => {
@@ -94,18 +101,18 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
     setIsPlaying(false);
   }
 
-  function handleNext() {
-    if (selected === null) return;
+  function handleNext(valueOverride?: string) {
+    const val = valueOverride ?? selected;
+    if (val === null) return;
     stopSpeaking();
 
     const newAnswer: Answer = {
-      section: 'hoeren', teil, itemId: item.id, value: selected,
+      section: 'hoeren', teil, itemId: item.id, value: val,
     };
     const updated = [...answers, newAnswer];
 
     if (practice) {
-      // Show feedback before advancing
-      setLastCorrect(selected === item.correct);
+      setLastCorrect(val === item.correct);
       setLastCorrectAnswer(getCorrectLabel(item));
       setPendingAnswers(updated);
       setPhase('feedback');
@@ -136,7 +143,7 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
   }
 
   function resetItem() {
-    setSelected(null);
+    pick(null);
     setAudioPlayed(false);
     setReplaysUsed(0);
     setIsPlaying(false);
@@ -231,14 +238,14 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
             <div className="rf-toggle">
               <button
                 type="button"
-                onClick={() => phase !== 'feedback' && setSelected('richtig')}
+                onClick={() => phase !== 'feedback' && pick('richtig')}
                 className={selected === 'richtig' ? 'active-richtig' : ''}
               >
                 <span className="kbd-hint">1</span> Richtig
               </button>
               <button
                 type="button"
-                onClick={() => phase !== 'feedback' && setSelected('falsch')}
+                onClick={() => phase !== 'feedback' && pick('falsch')}
                 className={selected === 'falsch' ? 'active-falsch' : ''}
               >
                 <span className="kbd-hint">2</span> Falsch
@@ -253,7 +260,7 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
               return (
                 <label
                   key={opt}
-                  onClick={() => phase !== 'feedback' && setSelected(val)}
+                  onClick={() => phase !== 'feedback' && pick(val)}
                   className={`option-card ${isSelected ? 'selected-blue' : ''}`}
                 >
                   <input
@@ -261,7 +268,7 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
                     name="hoeren-answer"
                     value={val}
                     checked={isSelected}
-                    onChange={() => phase !== 'feedback' && setSelected(val)}
+                    onChange={() => phase !== 'feedback' && pick(val)}
                   />
                   <span className="kbd-hint shrink-0">{i + 1}</span>
                   <span className={isSelected ? 'font-bold' : ''}>{opt}</span>
@@ -271,11 +278,10 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
           </div>
         )}
 
-        {/* Next (only show when not in feedback phase) */}
         {phase !== 'feedback' && (
           <div className="flex justify-end pt-2">
             <button
-              onClick={handleNext}
+              onClick={() => handleNext()}
               disabled={selected === null}
               className="btn-3d btn-3d-primary"
             >

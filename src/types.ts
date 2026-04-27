@@ -84,4 +84,5 @@ export interface ExamResult {
   maxPoints: number;
   passed: boolean;
   sprechenFeedback?: string;
+  schreibenFeedback?: string;
 }
