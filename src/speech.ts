@@ -1,39 +1,49 @@
 /**
- * Speech — TTS and STT with multi-backend support.
+ * Speech — TTS and STT using the Uptimize/Azure Speech gateway.
  *
- * TTS priority:
- *   1. OpenAI-compatible TTS  (VITE_OPENAI_BASE_URL + VITE_OPENAI_API_KEY)
- *      POST /audio/speech  →  { model: "tts-1", voice: "alloy", input }  →  mp3
- *   2. Azure Neural TTS       (VITE_AZURE_SPEECH_KEY + VITE_AZURE_SPEECH_ENDPOINT)
- *      POST /text_to_speech (SSML)  →  mp3
- *   3. Browser SpeechSynthesis (fallback, always available)
+ * Keys and endpoints come from repo/audio/.env — same keys, VITE_ prefix for browser exposure.
+ * Proxy (vite.config.ts): /api/speech → https://api.nlp.dev.uptimize.merckgroup.com/azure_speech_services
  *
- * STT priority:
- *   1. OpenAI Whisper         (VITE_OPENAI_BASE_URL + VITE_OPENAI_API_KEY)
- *      MediaRecorder → POST /audio/transcriptions (Whisper)
- *   2. Browser SpeechRecognition (Chrome/Edge only)
+ * TTS:
+ *   POST /api/speech/text_to_speech
+ *   Headers: x-api-key, Content-Type: application/x-www-form-urlencoded
+ *   Body: text (SSML), azure_voice, output_format
+ *   → mp3 audio
+ *
+ * STT:
+ *   POST /api/speech/speech_to_text
+ *   Headers: x-api-key, Content-Type: audio/wav
+ *   Body: raw WAV bytes (MediaRecorder → WAV or webm)
+ *   → { DisplayText: "..." }
+ *
+ * Fallback: Browser SpeechSynthesis (TTS) / SpeechRecognition (STT)
  */
 
 // ── Config ────────────────────────────────────────────────────────
 
+const AZURE_SPEECH_KEY = import.meta.env.VITE_AZURE_SPEECH_KEY as string | undefined;
+// In dev: routed through Vite proxy → Uptimize gateway. In prod: direct endpoint.
+const AZURE_SPEECH_BASE = import.meta.env.DEV
+  ? '/api/speech'
+  : (import.meta.env.VITE_AZURE_SPEECH_ENDPOINT as string | undefined);
+
+// OpenAI-compatible TTS/STT — only used if VITE_OPENAI_BASE_URL is explicitly set
 const OPENAI_BASE = (import.meta.env.VITE_OPENAI_BASE_URL as string | undefined)?.replace(/\/$/, '');
 const OPENAI_KEY = import.meta.env.VITE_OPENAI_API_KEY as string | undefined;
 const OPENAI_TTS_VOICE = (import.meta.env.VITE_OPENAI_TTS_VOICE as string | undefined) || 'alloy';
 const OPENAI_TTS_MODEL = (import.meta.env.VITE_OPENAI_TTS_MODEL as string | undefined) || 'tts-1';
 
-const AZURE_SPEECH_KEY = import.meta.env.VITE_AZURE_SPEECH_KEY as string | undefined;
-const AZURE_SPEECH_BASE = import.meta.env.DEV
-  ? '/api/speech'
-  : (import.meta.env.VITE_AZURE_SPEECH_ENDPOINT as string | undefined);
-
+function hasAzureTTS(): boolean {
+  return !!(AZURE_SPEECH_KEY && AZURE_SPEECH_BASE);
+}
+function hasAzureSTT(): boolean {
+  return !!(AZURE_SPEECH_KEY && AZURE_SPEECH_BASE);
+}
 function hasOpenAITTS(): boolean {
   return !!(OPENAI_BASE && OPENAI_KEY);
 }
 function hasOpenAISTT(): boolean {
   return !!(OPENAI_BASE && OPENAI_KEY);
-}
-function hasAzureTTS(): boolean {
-  return !!(AZURE_SPEECH_KEY && AZURE_SPEECH_BASE);
 }
 
 // ── Audio cache + state ───────────────────────────────────────────
@@ -236,6 +246,50 @@ function getBrowserSpeechRecognition(): any {
 }
 
 /**
+ * Azure Speech Services STT — same gateway as TTS.
+ * Records via MediaRecorder, POSTs audio bytes to /speech_to_text with x-api-key.
+ * Response JSON: { DisplayText: "..." } — matching repo/audio backend behaviour.
+ */
+async function listenAzureSTT(maxDurationMs = 20000): Promise<string> {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const chunks: Blob[] = [];
+
+  const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+    ? 'audio/webm;codecs=opus'
+    : undefined;
+  const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+
+  return new Promise<string>((resolve, reject) => {
+    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+    recorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+
+      try {
+        const res = await fetch(`${AZURE_SPEECH_BASE}/speech_to_text`, {
+          method: 'POST',
+          headers: {
+            'x-api-key': AZURE_SPEECH_KEY!,
+            'Content-Type': blob.type || 'audio/webm',
+          },
+          body: blob,
+        });
+        if (!res.ok) throw new Error(`Azure STT ${res.status}: ${res.statusText}`);
+        const data = await res.json();
+        // Gateway returns { DisplayText: "..." } (Azure Speech REST format)
+        resolve((data.DisplayText || data.text || data.transcript || '').trim());
+      } catch (err) {
+        reject(err);
+      }
+    };
+
+    recorder.start();
+    setTimeout(() => { if (recorder.state !== 'inactive') recorder.stop(); }, maxDurationMs);
+  });
+}
+
+/**
  * Record audio via MediaRecorder and transcribe via OpenAI Whisper.
  * Returns when the user stops (silence / maxDuration exceeded).
  */
@@ -338,14 +392,22 @@ function listenBrowser(
 }
 
 /**
- * Main listen entry point — tries Whisper if configured, falls back to browser STT.
- * onInterim fires with live partial text (browser STT only; Whisper has no interim).
+ * Main listen entry point.
+ * Priority: Azure Speech STT → OpenAI Whisper → Browser SpeechRecognition.
+ * onInterim fires with live partial text (browser STT only — Azure/Whisper have no streaming interim).
  */
 export async function listen(
   lang = 'de-DE',
   timeoutMs = 20000,
   onInterim?: (text: string) => void,
 ): Promise<string> {
+  if (hasAzureSTT()) {
+    try {
+      return await listenAzureSTT(timeoutMs);
+    } catch (err) {
+      console.warn('Azure STT failed, falling back:', err);
+    }
+  }
   if (hasOpenAISTT()) {
     try {
       return await listenWhisper(lang, timeoutMs);
@@ -357,5 +419,5 @@ export async function listen(
 }
 
 export function isSTTAvailable(): boolean {
-  return hasOpenAISTT() || getBrowserSpeechRecognition() !== null;
+  return hasAzureSTT() || hasOpenAISTT() || getBrowserSpeechRecognition() !== null;
 }
