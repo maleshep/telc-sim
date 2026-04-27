@@ -431,29 +431,41 @@ a {
    ANIMATIONS
    ═══════════════════════════════════════════════════════ */
 
+/* Full screen / component entrance — slight lift */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .fade-in {
-  animation: fadeInUp 0.35s ease-out;
+  animation: fadeInUp 0.22s ease-out both;
 }
 
+/* Tab content switch — opacity only, no translate (snappier) */
+@keyframes tabFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.tab-fade {
+  animation: tabFadeIn 0.15s ease-out both;
+}
+
+/* Inline reveal — slides in from right */
 @keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
+  from { opacity: 0; transform: translateX(12px); }
   to { opacity: 1; transform: translateX(0); }
 }
 .slide-in {
-  animation: slideInRight 0.3s ease-out;
+  animation: slideInRight 0.2s ease-out both;
 }
 
+/* Score / result reveal — reserved for important moments only */
 @keyframes bounceIn {
-  0% { transform: scale(0.9); opacity: 0; }
-  60% { transform: scale(1.03); opacity: 1; }
+  0% { transform: scale(0.92); opacity: 0; }
+  60% { transform: scale(1.02); opacity: 1; }
   100% { transform: scale(1); }
 }
 .bounce-in {
-  animation: bounceIn 0.4s ease-out;
+  animation: bounceIn 0.35s ease-out both;
 }
 
 @keyframes shimmer {

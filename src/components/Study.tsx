@@ -83,13 +83,15 @@ export function Study({ onBack }: { onBack: () => void }) {
       {/* Content */}
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-4">
         {tab === 'games' && (
-          <GamesView
-            onFlashcards={() => setActiveGame('flashcards')}
-            onQuiz={() => setActiveGame('quiz')}
-          />
+          <div key="games" className="tab-fade">
+            <GamesView
+              onFlashcards={() => setActiveGame('flashcards')}
+              onQuiz={() => setActiveGame('quiz')}
+            />
+          </div>
         )}
-        {tab === 'vocabulary' && <VocabularyView search={search} />}
-        {tab === 'grammar' && <GrammarView search={search} />}
+        {tab === 'vocabulary' && <div key="vocab" className="tab-fade"><VocabularyView search={search} /></div>}
+        {tab === 'grammar' && <div key="grammar" className="tab-fade"><GrammarView search={search} /></div>}
       </main>
     </div>
   );
@@ -103,7 +105,7 @@ function GamesView({ onFlashcards, onQuiz }: {
 }) {
   const stats = getStats();
   return (
-    <div className="space-y-4 fade-in">
+    <div className="space-y-4">
       {/* Vocab progress banner */}
       {(stats.lookedUp > 0 || stats.known > 0) && (
         <div className="card !rounded-2xl p-4 flex items-center gap-4">

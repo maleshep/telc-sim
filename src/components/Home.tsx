@@ -100,45 +100,42 @@ export function Home({ tests, onStartExam, onPractice, onStudy, onHistory }: Hom
           </span>
         </div>
 
-        {/* Test selector */}
-        <div className="flex gap-2 justify-center fade-in">
-          {tests.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setSelectedTest(t.id)}
-              className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                selectedTest === t.id
-                  ? 'bg-telc text-white shadow-md shadow-telc/20 scale-105'
-                  : 'bg-white text-gray-500 border-2 border-card-border hover:border-telc/40 hover:text-telc'
-              }`}
-            >
-              {t.name}
-            </button>
-          ))}
-        </div>
-
-        {/* Full exam start — 3D button style */}
-        <button
-          onClick={() => onStartExam(selectedTest)}
-          className="btn-3d btn-3d-primary w-full !py-5 !px-6 !rounded-2xl !text-lg group fade-in"
-        >
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                <GraduationCap size={24} />
-              </div>
-              <div className="text-left">
-                <div className="font-extrabold text-lg">
-                  Prüfungsmodus
+        {/* Full exam start — test selector embedded inline */}
+        <div className="fade-in space-y-2">
+          <button
+            onClick={() => onStartExam(selectedTest)}
+            className="btn-3d btn-3d-primary w-full !py-5 !px-6 !rounded-2xl !text-lg group"
+          >
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                  <GraduationCap size={24} />
                 </div>
-                <div className="text-sm text-white/70 font-normal">
-                  Alle 4 Teile — mit Zeitlimit
+                <div className="text-left">
+                  <div className="font-extrabold text-lg">Prüfungsmodus</div>
+                  <div className="text-sm text-white/70 font-normal">Alle 4 Teile — mit Zeitlimit</div>
                 </div>
               </div>
+              <Play size={22} className="shrink-0 group-hover:translate-x-0.5 transition-transform" />
             </div>
-            <Play size={22} className="shrink-0 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+          {/* Compact test selector — only relevant here */}
+          <div className="flex gap-1.5 justify-center pt-0.5">
+            {tests.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setSelectedTest(t.id)}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  selectedTest === t.id
+                    ? 'bg-telc/15 text-telc border-2 border-telc/30'
+                    : 'bg-white text-gray-400 border-2 border-card-border hover:border-telc/30 hover:text-telc'
+                }`}
+              >
+                {t.name}
+              </button>
+            ))}
           </div>
-        </button>
+        </div>
 
         {/* Section browser (Übungsmodus) */}
         <section className="fade-in">

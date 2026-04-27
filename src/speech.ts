@@ -284,8 +284,13 @@ async function listenWhisper(lang = 'de-DE', maxDurationMs = 20000): Promise<str
 
 /**
  * Browser SpeechRecognition STT (Chrome/Edge).
+ * onInterim fires with the running transcript as the user speaks.
  */
-function listenBrowser(lang = 'de-DE', timeoutMs = 20000): Promise<string> {
+function listenBrowser(
+  lang = 'de-DE',
+  timeoutMs = 20000,
+  onInterim?: (text: string) => void,
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const SR = getBrowserSpeechRecognition();
     if (!SR) { reject(new Error('Speech recognition not supported')); return; }
@@ -293,33 +298,39 @@ function listenBrowser(lang = 'de-DE', timeoutMs = 20000): Promise<string> {
     const recognition = new SR();
     recognition.lang = lang;
     recognition.continuous = true;
-    recognition.interimResults = false;
+    recognition.interimResults = true;
     recognition.maxAlternatives = 1;
 
     let settled = false;
-    let transcript = '';
+    let finalTranscript = '';
 
     const timer = setTimeout(() => {
-      if (!settled) { settled = true; recognition.stop(); resolve(transcript); }
+      if (!settled) { settled = true; recognition.stop(); resolve(finalTranscript.trim()); }
     }, timeoutMs);
 
     recognition.onresult = (event: any) => {
+      let interim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) transcript += event.results[i][0].transcript + ' ';
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript + ' ';
+        } else {
+          interim += event.results[i][0].transcript;
+        }
       }
+      if (onInterim) onInterim((finalTranscript + interim).trim());
     };
 
     recognition.onerror = (event: any) => {
       if (!settled) {
         settled = true;
         clearTimeout(timer);
-        if (event.error === 'no-speech' || event.error === 'aborted') resolve(transcript);
+        if (event.error === 'no-speech' || event.error === 'aborted') resolve(finalTranscript.trim());
         else reject(new Error(`STT error: ${event.error}`));
       }
     };
 
     recognition.onend = () => {
-      if (!settled) { settled = true; clearTimeout(timer); resolve(transcript.trim()); }
+      if (!settled) { settled = true; clearTimeout(timer); resolve(finalTranscript.trim()); }
     };
 
     recognition.start();
@@ -328,8 +339,13 @@ function listenBrowser(lang = 'de-DE', timeoutMs = 20000): Promise<string> {
 
 /**
  * Main listen entry point — tries Whisper if configured, falls back to browser STT.
+ * onInterim fires with live partial text (browser STT only; Whisper has no interim).
  */
-export async function listen(lang = 'de-DE', timeoutMs = 20000): Promise<string> {
+export async function listen(
+  lang = 'de-DE',
+  timeoutMs = 20000,
+  onInterim?: (text: string) => void,
+): Promise<string> {
   if (hasOpenAISTT()) {
     try {
       return await listenWhisper(lang, timeoutMs);
@@ -337,7 +353,7 @@ export async function listen(lang = 'de-DE', timeoutMs = 20000): Promise<string>
       console.warn('Whisper STT failed, falling back to browser STT:', err);
     }
   }
-  return listenBrowser(lang, timeoutMs);
+  return listenBrowser(lang, timeoutMs, onInterim);
 }
 
 export function isSTTAvailable(): boolean {

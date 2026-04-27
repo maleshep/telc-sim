@@ -25,6 +25,7 @@ export function Sprechen({ data, teile, onComplete }: SprechenProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [manualInput, setManualInput] = useState('');
+  const [interimText, setInterimText] = useState('');
   const convRef = useRef<ChatMessage[]>([]);
 
   // Stop any playing audio when the component unmounts
@@ -50,13 +51,15 @@ export function Sprechen({ data, teile, onComplete }: SprechenProps) {
     setIsRecording(true);
     setPhase('recording');
     setTranscript('');
+    setInterimText('');
     try {
-      const text = await listen('de-DE', 30000);
+      const text = await listen('de-DE', 30000, (interim) => setInterimText(interim));
       setTranscript(text);
     } catch {
       setTranscript('');
     }
     setIsRecording(false);
+    setInterimText('');
     setPhase('response');
   }
 
@@ -225,7 +228,14 @@ export function Sprechen({ data, teile, onComplete }: SprechenProps) {
               <Mic size={28} />
             </div>
             <p className="text-wrong font-bold">Aufnahme läuft...</p>
-            <p className="text-gray-400 text-sm">Sprechen Sie jetzt. Die Aufnahme stoppt automatisch.</p>
+            {/* Live interim transcript */}
+            <div className="min-h-[48px] bg-exam-bg border-2 border-dashed border-wrong/30 rounded-xl px-4 py-3 text-left">
+              {interimText ? (
+                <p className="text-gray-700 font-medium text-sm leading-relaxed">{interimText}<span className="inline-block w-0.5 h-4 bg-wrong ml-0.5 animate-pulse align-middle" /></p>
+              ) : (
+                <p className="text-gray-400 text-sm italic">Sprechen Sie jetzt...</p>
+              )}
+            </div>
           </div>
         )}
 
