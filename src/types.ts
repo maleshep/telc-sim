@@ -3,6 +3,7 @@
 export interface HoerenItem {
   id: number;
   audio: string;        // Text for TTS to read aloud (the "audio" script)
+  audioFile?: string;   // Pre-recorded compressed audio, e.g. "/audio/t1-h1-item1.mp3"
   context?: string;     // Scene context shown before audio plays
   question: string;
   options: string[];    // ["a) ...", "b) ...", "c) ..."]

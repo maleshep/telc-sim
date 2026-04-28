@@ -3,20 +3,29 @@ import type { VocabTopic, GrammarRule } from '../study-data';
 import { studyData } from '../study-data';
 import {
   BookOpen, Languages, ChevronRight, ChevronDown,
-  ArrowLeft, Search, Gamepad2, CreditCard, HelpCircle, Star,
+  ArrowLeft, Search, Gamepad2, CreditCard, HelpCircle, Star, BrainCircuit, Puzzle,
 } from 'lucide-react';
 import { getStats } from '../vocabTracking';
 import { Flashcards } from './Flashcards';
 import { VocabQuiz } from './VocabQuiz';
+import { GrammarQuiz } from './GrammarQuiz';
+import { SentenceBuilder } from './SentenceBuilder';
 
 type Tab = 'games' | 'vocabulary' | 'grammar';
+type ActiveGame = 'flashcards' | 'quiz' | 'grammar-quiz' | 'sentence-builder' | null;
 
 export function Study({ onBack }: { onBack: () => void }) {
   const [tab, setTab] = useState<Tab>('games');
   const [search, setSearch] = useState('');
-  const [activeGame, setActiveGame] = useState<'flashcards' | 'quiz' | null>(null);
+  const [activeGame, setActiveGame] = useState<ActiveGame>(null);
 
   // ── Active game screens ─────────────────────────────────────────
+  if (activeGame === 'grammar-quiz') {
+    return <GrammarQuiz onBack={() => setActiveGame(null)} />;
+  }
+  if (activeGame === 'sentence-builder') {
+    return <SentenceBuilder onBack={() => setActiveGame(null)} />;
+  }
   if (activeGame === 'flashcards') {
     return <Flashcards onBack={() => setActiveGame(null)} />;
   }
@@ -87,6 +96,8 @@ export function Study({ onBack }: { onBack: () => void }) {
             <GamesView
               onFlashcards={() => setActiveGame('flashcards')}
               onQuiz={() => setActiveGame('quiz')}
+              onGrammarQuiz={() => setActiveGame('grammar-quiz')}
+              onSentenceBuilder={() => setActiveGame('sentence-builder')}
             />
           </div>
         )}
@@ -99,9 +110,11 @@ export function Study({ onBack }: { onBack: () => void }) {
 
 // ── Games ────────────────────────────────────────────────────────
 
-function GamesView({ onFlashcards, onQuiz }: {
+function GamesView({ onFlashcards, onQuiz, onGrammarQuiz, onSentenceBuilder }: {
   onFlashcards: () => void;
   onQuiz: () => void;
+  onGrammarQuiz: () => void;
+  onSentenceBuilder: () => void;
 }) {
   const stats = getStats();
   return (
@@ -162,6 +175,53 @@ function GamesView({ onFlashcards, onQuiz }: {
             </div>
           </div>
           <ChevronRight size={18} className="text-gray-300 group-hover:text-section-lesen transition-colors shrink-0" />
+        </div>
+      </button>
+
+      {/* Divider */}
+      <div className="flex items-center gap-3 py-1">
+        <div className="flex-1 h-px bg-card-border" />
+        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Grammatik</span>
+        <div className="flex-1 h-px bg-card-border" />
+      </div>
+
+      <button
+        onClick={onGrammarQuiz}
+        className="card card-interactive w-full !rounded-2xl p-5 text-left group"
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-section-schreiben text-white flex items-center justify-center shadow-sm shrink-0">
+            <BrainCircuit size={26} />
+          </div>
+          <div className="flex-1">
+            <div className="font-extrabold text-section-schreiben group-hover:text-section-schreiben-dark transition-colors">Grammatik-Quiz</div>
+            <div className="text-sm text-gray-500">Lückentext — Konjugation, Akkusativ, Modalverben & mehr</div>
+            <div className="flex gap-1.5 mt-2">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-section-schreiben-light text-section-schreiben">7 Kategorien</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">60+ Fragen</span>
+            </div>
+          </div>
+          <ChevronRight size={18} className="text-gray-300 group-hover:text-section-schreiben transition-colors shrink-0" />
+        </div>
+      </button>
+
+      <button
+        onClick={onSentenceBuilder}
+        className="card card-interactive w-full !rounded-2xl p-5 text-left group"
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-telc text-white flex items-center justify-center shadow-sm shrink-0">
+            <Puzzle size={26} />
+          </div>
+          <div className="flex-1">
+            <div className="font-extrabold text-telc group-hover:text-telc-dark transition-colors">Satzpuzzle</div>
+            <div className="text-sm text-gray-500">Wörter in die richtige Reihenfolge bringen — Wortstellung üben</div>
+            <div className="flex gap-1.5 mt-2">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-telc-light text-telc-dark">V2-Regel</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">40+ Sätze</span>
+            </div>
+          </div>
+          <ChevronRight size={18} className="text-gray-300 group-hover:text-telc transition-colors shrink-0" />
         </div>
       </button>
     </div>

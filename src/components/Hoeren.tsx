@@ -85,10 +85,23 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
     return () => window.removeEventListener('keydown', fn);
   }, []);
 
+  async function playItem(): Promise<void> {
+    // Prefer pre-recorded file; fall back to TTS
+    if (item.audioFile) {
+      return new Promise((resolve, reject) => {
+        const audio = new Audio(item.audioFile!);
+        audio.onended = () => resolve();
+        audio.onerror = () => speak(item.audio).then(resolve).catch(reject);
+        audio.play().catch(() => speak(item.audio).then(resolve).catch(reject));
+      });
+    }
+    return speak(item.audio);
+  }
+
   async function playAudio() {
     if (!item || isPlaying) return;
     setIsPlaying(true);
-    try { await speak(item.audio); } catch { /* TTS unavailable */ }
+    try { await playItem(); } catch { /* unavailable */ }
     setIsPlaying(false);
     setAudioPlayed(true);
   }
@@ -97,7 +110,7 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
     if (replaysUsed >= teilData.replays - 1 || isPlaying) return;
     setReplaysUsed(r => r + 1);
     setIsPlaying(true);
-    try { await speak(item.audio); } catch { /* ignore */ }
+    try { await playItem(); } catch { /* ignore */ }
     setIsPlaying(false);
   }
 
