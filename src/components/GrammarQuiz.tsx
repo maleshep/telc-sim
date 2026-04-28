@@ -67,7 +67,7 @@ function CategoryPicker({ onSelect, onBack, questions, level }: {
             </div>
           </button>
 
-          {ALL_CATEGORIES.map(cat => (
+          {ALL_CATEGORIES.filter(cat => (counts[cat] ?? 0) > 0).map(cat => (
             <button
               key={cat}
               onClick={() => onSelect(cat)}
