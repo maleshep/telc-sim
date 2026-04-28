@@ -247,13 +247,35 @@ function App() {
 
     if (hasT1) {
       maxPts += 5;
-      for (let i = 0; i < fields.length; i++) {
-        const a = allAnswers.find(
-          ans => ans.section === 'schreiben' && ans.teil === 'teil1' && ans.itemId === i,
-        );
-        if (a && matchField(fields[i].answer, a.value)) t1ok++;
+      if (test.schreiben.teil1.mode === 'letter') {
+        // Letter mode (B1+): score as free text
+        const letterAns = allAnswers.find(a => a.section === 'schreiben' && a.teil === 'teil1' && a.itemId === 0)?.value || '';
+        const t1MinWords = test.schreiben.teil1.minWords ?? 50;
+        if (isLLMConfigured() && letterAns.trim()) {
+          try {
+            const r = await evaluateSchreiben(
+              test.schreiben.teil1.personCard.join('\n'), [], letterAns, t1MinWords,
+            );
+            pts += Math.min(5, (r.score / 10) * 5);
+            feedback = (feedback ? feedback + '\n\n' : '') + (r.feedback || '');
+          } catch {
+            const wc = letterAns.trim().split(/\s+/).filter(Boolean).length;
+            pts += Math.round(Math.min(1, wc / Math.max(1, t1MinWords)) * 5);
+          }
+        } else {
+          const wc = letterAns.trim().split(/\s+/).filter(Boolean).length;
+          pts += Math.round(Math.min(1, wc / Math.max(1, t1MinWords)) * 5);
+        }
+      } else {
+        // Standard form mode (A1/A2): field matching
+        for (let i = 0; i < fields.length; i++) {
+          const a = allAnswers.find(
+            ans => ans.section === 'schreiben' && ans.teil === 'teil1' && ans.itemId === i,
+          );
+          if (a && matchField(fields[i].answer, a.value)) t1ok++;
+        }
+        pts += fields.length > 0 ? (t1ok / fields.length) * 5 : 0;
       }
-      pts += fields.length > 0 ? (t1ok / fields.length) * 5 : 0;
     }
 
     if (hasT2) {

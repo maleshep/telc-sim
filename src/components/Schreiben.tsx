@@ -28,11 +28,25 @@ export function Schreiben({ data, teile, onComplete }: SchreibenProps) {
     setFormValues(prev => ({ ...prev, [idx]: value }));
   }
 
+  // Letter mode (B1+): Teil 1 is free-text letter, stored as teil1/itemId:0
+  const [letterText, setLetterText] = useState('');
+  const isLetterMode = data.teil1.mode === 'letter';
+  const t1MinWords = data.teil1.minWords ?? 0;
+  const letterWordCount = letterText.trim().split(/\s+/).filter(Boolean).length;
+
   function submitForm() {
+    if (isLetterMode) {
+      // Letter mode: store free text as the T1 answer
+      const answers: Answer[] = [
+        { section: 'schreiben', teil: 'teil1', itemId: 0, value: letterText },
+      ];
+      if (hasTeil2) { setPhase('instruction2'); }
+      else { onComplete(answers); }
+      return;
+    }
     if (hasTeil2) {
       setPhase('instruction2');
     } else {
-      // Only Teil 1 selected — submit just form answers
       const answers: Answer[] = [];
       data.teil1.fields.forEach((_field, idx) => {
         answers.push({ section: 'schreiben', teil: 'teil1', itemId: idx, value: formValues[idx] || '' });
@@ -45,9 +59,13 @@ export function Schreiben({ data, teile, onComplete }: SchreibenProps) {
     const answers: Answer[] = [];
 
     if (hasTeil1) {
-      data.teil1.fields.forEach((_field, idx) => {
-        answers.push({ section: 'schreiben', teil: 'teil1', itemId: idx, value: formValues[idx] || '' });
-      });
+      if (isLetterMode) {
+        answers.push({ section: 'schreiben', teil: 'teil1', itemId: 0, value: letterText });
+      } else {
+        data.teil1.fields.forEach((_field, idx) => {
+          answers.push({ section: 'schreiben', teil: 'teil1', itemId: idx, value: formValues[idx] || '' });
+        });
+      }
     }
 
     answers.push({ section: 'schreiben', teil: 'teil2', itemId: 0, value: messageText });
@@ -55,12 +73,15 @@ export function Schreiben({ data, teile, onComplete }: SchreibenProps) {
   }
 
   function handleTimeUp() {
-    // Build whatever answers exist at timeout and complete immediately
     const answers: Answer[] = [];
     if (hasTeil1) {
-      data.teil1.fields.forEach((_field, idx) => {
-        answers.push({ section: 'schreiben', teil: 'teil1', itemId: idx, value: formValues[idx] || '' });
-      });
+      if (isLetterMode) {
+        answers.push({ section: 'schreiben', teil: 'teil1', itemId: 0, value: letterText });
+      } else {
+        data.teil1.fields.forEach((_field, idx) => {
+          answers.push({ section: 'schreiben', teil: 'teil1', itemId: idx, value: formValues[idx] || '' });
+        });
+      }
     }
     if (hasTeil2) {
       answers.push({ section: 'schreiben', teil: 'teil2', itemId: 0, value: messageText });
@@ -125,22 +146,44 @@ export function Schreiben({ data, teile, onComplete }: SchreibenProps) {
             {data.teil1.formTitle}
           </h3>
 
-          <div className="space-y-4">
-            {data.teil1.fields.map((field, idx) => (
-              <div key={idx}>
-                <label className="block text-sm font-bold text-gray-600 mb-1.5">
-                  {field.label}
-                </label>
-                <input
-                  type="text"
-                  value={formValues[idx] || ''}
-                  onChange={e => handleFormField(idx, e.target.value)}
-                  placeholder={field.hint || ''}
-                  className="w-full px-4 py-3 text-base"
-                />
-              </div>
-            ))}
-          </div>
+          {isLetterMode ? (
+            /* Letter mode — free text */
+            <div>
+              <textarea
+                value={letterText}
+                onChange={e => setLetterText(e.target.value)}
+                placeholder="Schreiben Sie hier Ihren Brief oder Ihre E-Mail..."
+                rows={10}
+                className="w-full px-4 py-3 leading-relaxed text-base"
+              />
+              {t1MinWords > 0 && (
+                <div className="flex justify-between items-center text-sm mt-2">
+                  <span className={`flex items-center gap-1.5 font-bold ${letterWordCount >= t1MinWords ? 'text-correct' : 'text-gray-400'}`}>
+                    {letterWordCount >= t1MinWords && <CheckCircle size={14} />}
+                    {letterWordCount} / {t1MinWords} Wörter
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Standard form mode */
+            <div className="space-y-4">
+              {data.teil1.fields.map((field, idx) => (
+                <div key={idx}>
+                  <label className="block text-sm font-bold text-gray-600 mb-1.5">
+                    {field.label}
+                  </label>
+                  <input
+                    type="text"
+                    value={formValues[idx] || ''}
+                    onChange={e => handleFormField(idx, e.target.value)}
+                    placeholder={field.hint || ''}
+                    className="w-full px-4 py-3 text-base"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="flex justify-end pt-2">
             <button
@@ -185,7 +228,7 @@ export function Schreiben({ data, teile, onComplete }: SchreibenProps) {
         <span className="text-sm font-semibold">
           <span className="text-section-schreiben">Schreiben</span> — Teil 2
         </span>
-        <Timer seconds={SCHREIBEN_TIME} onExpired={handleTimeUp} />
+        <Timer seconds={getRemainingSeconds()} onExpired={handleTimeUp} />
       </div>
 
       <div className="card !rounded-2xl p-6 md:p-8 space-y-6">

@@ -27,8 +27,15 @@ export function Flashcards({ onBack, level = 'A1' }: FlashcardsProps) {
   const [topicId, setTopicId] = useState<string | null>(null);
   const [cardIdx, setCardIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
-  const [known, setKnown] = useState<Set<number>>(new Set());
+  const [known, setKnown] = useState<Set<string>>(new Set()); // keyed by word.german, not index
   const [shuffled, setShuffled] = useState(false);
+
+  // Reset known + position whenever topic changes
+  useEffect(() => {
+    setKnown(new Set());
+    setCardIdx(0);
+    setFlipped(false);
+  }, [topicId]);
 
   const topic = topicId ? vocabList.find(t => t.id === topicId) : null;
   const words = useMemo(() => {
@@ -53,8 +60,9 @@ export function Flashcards({ onBack, level = 'A1' }: FlashcardsProps) {
   }
 
   function markKnown() {
-    setKnown(prev => new Set([...prev, cardIdx]));
-    if (card) persistMarkKnown(card.german);
+    if (!card) return;
+    setKnown(prev => new Set([...prev, card.german]));
+    persistMarkKnown(card.german);
     nextCard();
   }
 
@@ -169,7 +177,7 @@ export function Flashcards({ onBack, level = 'A1' }: FlashcardsProps) {
 
           <button
             onClick={markKnown}
-            disabled={known.has(cardIdx)}
+            disabled={known.has(card?.german ?? '')}
             className="btn-3d btn-3d-primary !px-5"
           >
             <CheckCircle size={18} />

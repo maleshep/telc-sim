@@ -11,7 +11,7 @@ export const testsB1: TelcTest[] = [
     hoeren: {
       teil1: {
         instruction: 'Sie hören fünf kurze Texte aus dem Radio. Zu jedem Text gibt es eine Aufgabe. Kreuzen Sie die richtige Antwort an. Sie hören jeden Text zweimal.',
-        replays: 2,
+        replays: 1,
         items: [
           {
             id: 1,
@@ -252,6 +252,7 @@ export const testsB1: TelcTest[] = [
     },
     schreiben: {
       teil1: {
+        mode: 'letter' as const,
         instruction: 'Lesen Sie die Situation und schreiben Sie einen formellen Brief oder eine E-Mail.',
         formTitle: 'Formeller Beschwerdebrief',
         personCard: [
@@ -328,7 +329,7 @@ export const testsB1: TelcTest[] = [
     hoeren: {
       teil1: {
         instruction: 'Sie hören fünf kurze Nachrichten oder Ankündigungen. Kreuzen Sie die richtige Antwort an.',
-        replays: 2,
+        replays: 1,
         items: [
           {
             id: 1,
@@ -569,6 +570,7 @@ export const testsB1: TelcTest[] = [
     },
     schreiben: {
       teil1: {
+        mode: 'letter' as const,
         instruction: 'Schreiben Sie eine formelle E-Mail.',
         formTitle: 'Formelle Anfrage',
         personCard: [
@@ -643,7 +645,7 @@ export const testsB1: TelcTest[] = [
     hoeren: {
       teil1: {
         instruction: 'Sie hören fünf kurze Texte. Kreuzen Sie die richtige Antwort an.',
-        replays: 2,
+        replays: 1,
         items: [
           {
             id: 1,
@@ -884,6 +886,7 @@ export const testsB1: TelcTest[] = [
     },
     schreiben: {
       teil1: {
+        mode: 'letter' as const,
         instruction: 'Lesen Sie die Situation. Schreiben Sie eine formelle E-Mail.',
         formTitle: 'Bewerbungsschreiben — Auslandspraktikum',
         personCard: [

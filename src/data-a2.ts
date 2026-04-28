@@ -301,7 +301,7 @@ export const testsA2: TelcTest[] = [
           'Fragen Sie, um wie viel Uhr die Party beginnt',
           'Schreiben Sie, was Sie mitbringen',
         ],
-        minWords: 40,
+        minWords: 50,
       },
     },
     sprechen: {
@@ -640,7 +640,7 @@ export const testsA2: TelcTest[] = [
           'Fragen Sie, ob Sie Unterlagen bekommen können',
           'Wünschen Sie gute Besserung',
         ],
-        minWords: 40,
+        minWords: 50,
       },
     },
     sprechen: {
@@ -978,7 +978,7 @@ export const testsA2: TelcTest[] = [
           'Erwähnen Sie, dass Sie schon zweimal angerufen haben',
           'Bitten Sie um schnelle Hilfe',
         ],
-        minWords: 40,
+        minWords: 50,
       },
     },
     sprechen: {

@@ -30,10 +30,12 @@ export interface LesenTeil {
 }
 
 export interface SchreibenTeil1 {
+  mode?: 'form' | 'letter'; // 'form' = field-filling (A1/A2 default), 'letter' = free letter/email (B1+)
   instruction: string;
   formTitle: string;
-  personCard: string[];   // Fictional person's data shown to the user
+  personCard: string[];   // Fictional person's data / letter situation shown to the user
   fields: { label: string; answer: string; hint?: string }[];
+  minWords?: number;      // For letter mode — minimum word count
 }
 
 export interface SchreibenTeil2 {
