@@ -4,10 +4,11 @@ import { CheckCircle, XCircle } from 'lucide-react';
 interface AnswerFeedbackProps {
   isCorrect: boolean;
   correctAnswer: string;
+  correctAnswerEn?: string;   // optional English translation shown in italics
   onContinue: () => void;
 }
 
-export function AnswerFeedback({ isCorrect, correctAnswer, onContinue }: AnswerFeedbackProps) {
+export function AnswerFeedback({ isCorrect, correctAnswer, correctAnswerEn, onContinue }: AnswerFeedbackProps) {
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -44,6 +45,9 @@ export function AnswerFeedback({ isCorrect, correctAnswer, onContinue }: AnswerF
                 <div className="text-sm text-white/80 font-medium">
                   Richtige Antwort: <strong className="text-white">{correctAnswer}</strong>
                 </div>
+                {correctAnswerEn && (
+                  <div className="text-xs text-white/60 italic mt-0.5">{correctAnswerEn}</div>
+                )}
               </div>
             </>
           )}

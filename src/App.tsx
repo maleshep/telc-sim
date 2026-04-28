@@ -14,8 +14,10 @@ import { History } from './components/History';
 import { saveResult, savePracticeResult } from './history';
 import { WordLookupProvider } from './components/WordPopup';
 import { type ExamLevel, loadActiveLevel, saveActiveLevel } from './levelConfig';
+import { ExamPicker } from './components/ExamPicker';
+import { WeaknessDetail } from './components/WeaknessDetail';
 
-type Screen = 'home' | 'section-picker' | 'hoeren' | 'lesen' | 'schreiben' | 'sprechen' | 'scoring' | 'results' | 'study' | 'history';
+type Screen = 'home' | 'exam-picker' | 'section-picker' | 'hoeren' | 'lesen' | 'schreiben' | 'sprechen' | 'scoring' | 'results' | 'study' | 'history' | 'weakness';
 type Mode = 'exam' | 'practice';
 
 // Fixed exam sequence
@@ -56,6 +58,12 @@ function App() {
 
   // ── Navigation ──────────────────────────────────────────────────
 
+  // Called from Home → go to exam picker first
+  function handleGoToExamPicker() {
+    setScreen('exam-picker');
+  }
+
+  // Called from ExamPicker after choosing a test
   function handleStartExam(id: number) {
     setTestId(id);
     setMode('exam');
@@ -300,10 +308,32 @@ function App() {
         tests={levelTests}
         level={level}
         onLevelChange={handleLevelChange}
-        onStartExam={handleStartExam}
+        onStartExam={handleGoToExamPicker}
         onPractice={handlePracticeSection}
         onStudy={() => setScreen('study')}
         onHistory={() => setScreen('history')}
+        onWeakness={() => setScreen('weakness')}
+      />
+    );
+  }
+
+  if (screen === 'exam-picker') {
+    return (
+      <ExamPicker
+        tests={levelTests}
+        onStart={handleStartExam}
+        onBack={() => setScreen('home')}
+      />
+    );
+  }
+
+  if (screen === 'weakness') {
+    return (
+      <WeaknessDetail
+        level={level}
+        onPractice={(section) => handlePracticeSection(test.id, section)}
+        onStudy={() => setScreen('study')}
+        onBack={() => setScreen('home')}
       />
     );
   }

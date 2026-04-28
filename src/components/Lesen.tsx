@@ -3,6 +3,8 @@ import type { LesenTeil, Answer, Teil } from '../types';
 import { ChevronRight, BookOpen } from 'lucide-react';
 import { Timer } from './Timer';
 import { AnswerFeedback } from './AnswerFeedback';
+import { recordMistake } from '../mistakeTracking';
+import { loadActiveLevel } from '../levelConfig';
 
 interface LesenProps {
   data: { teil1: LesenTeil; teil2: LesenTeil; teil3: LesenTeil };
@@ -94,8 +96,19 @@ export function Lesen({ data, teile, practice, onComplete }: LesenProps) {
     };
     const updated = [...answers, newAnswer];
 
+    const isCorrect = val === item.correct;
     if (practice) {
-      setLastCorrect(val === item.correct);
+      if (!isCorrect) {
+        recordMistake({
+          type: 'lesen',
+          level: loadActiveLevel(),
+          question: item.question,
+          correct: getCorrectLabel(item),
+          wrong: item.options.find(o => o === val || o.startsWith(val)) ?? val,
+          teil,
+        });
+      }
+      setLastCorrect(isCorrect);
       setLastCorrectAnswer(getCorrectLabel(item));
       setPendingAnswers(updated);
       setPhase('feedback');

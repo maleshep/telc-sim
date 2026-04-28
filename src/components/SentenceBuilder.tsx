@@ -210,6 +210,7 @@ export function SentenceBuilder({ onBack }: SentenceBuilderProps) {
             <div className="text-xs font-bold text-section-schreiben uppercase tracking-wider mb-1.5">Richtige Reihenfolge:</div>
             <div className="font-bold text-gray-800">{exercise.words.join(' ')}</div>
             <div className="text-sm text-gray-600 mt-2">{exercise.tip}</div>
+            {exercise.tipEn && <div className="text-xs text-gray-400 italic mt-1">{exercise.tipEn}</div>}
           </div>
         )}
         {phase === 'correct' && (
@@ -219,6 +220,7 @@ export function SentenceBuilder({ onBack }: SentenceBuilderProps) {
               <span className="font-bold text-correct">Richtig!</span>
             </div>
             <div className="text-sm text-gray-600 mt-1">{exercise.tip}</div>
+            {exercise.tipEn && <div className="text-xs text-gray-400 italic mt-1">{exercise.tipEn}</div>}
           </div>
         )}
 

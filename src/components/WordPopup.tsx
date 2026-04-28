@@ -22,12 +22,21 @@ export function WordLookupProvider({ children, enabled = true }: { children: Rea
 
   const handleDblClick = useCallback((e: MouseEvent) => {
     if (!enabled) return;
-    const sel = window.getSelection()?.toString().trim();
-    if (!sel || sel.length < 2 || sel.length > 30) return;
+    let sel = window.getSelection()?.toString().trim() ?? '';
+    // Triple-click selects a whole line — extract the word nearest the cursor instead
+    if (sel.includes(' ') && sel.length > 40) {
+      // Fall back to the word under the mouse via caretRangeFromPoint
+      const range = document.caretRangeFromPoint?.(e.clientX, e.clientY);
+      if (range) {
+        (range as any).expand?.('word');
+        sel = range.toString().trim();
+      }
+    }
+    if (!sel || sel.length < 2 || sel.length > 40) return;
 
     // Strip articles/punctuation to get the bare word
-    const bare = sel.replace(/^(der|die|das|ein|eine|einen|dem|den|des)\s+/i, '').replace(/[.,!?;:]/g, '').trim();
-    if (!bare) return;
+    const bare = sel.replace(/^(der|die|das|ein|eine|einen|dem|den|des)\s+/i, '').replace(/[.,!?;:()\-]/g, '').trim();
+    if (!bare || bare.includes(' ')) return;
 
     const match = findWord(bare);
     trackLookedUp(bare);

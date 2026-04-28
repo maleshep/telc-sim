@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import type { HoerenTeil, Answer, Teil } from '../types';
 import { speak, stopSpeaking } from '../speech';
+import { recordMistake } from '../mistakeTracking';
+import { loadActiveLevel } from '../levelConfig';
 import { Volume2, RotateCcw, ChevronRight, Headphones } from 'lucide-react';
 import { AnswerFeedback } from './AnswerFeedback';
 
@@ -124,8 +126,19 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
     };
     const updated = [...answers, newAnswer];
 
+    const isCorrect = val === item.correct;
     if (practice) {
-      setLastCorrect(val === item.correct);
+      if (!isCorrect) {
+        recordMistake({
+          type: 'hoeren',
+          level: loadActiveLevel(),
+          question: item.question,
+          correct: getCorrectLabel(item),
+          wrong: item.options.find(o => optionValue(o) === val) ?? val,
+          teil,
+        });
+      }
+      setLastCorrect(isCorrect);
       setLastCorrectAnswer(getCorrectLabel(item));
       setPendingAnswers(updated);
       setPhase('feedback');

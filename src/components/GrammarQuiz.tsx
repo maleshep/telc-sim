@@ -7,6 +7,8 @@ import {
   CATEGORY_COLORS,
   type GrammarCategory,
 } from '../grammar-games-data';
+import { recordMistake } from '../mistakeTracking';
+import { loadActiveLevel } from '../levelConfig';
 
 interface GrammarQuizProps {
   onBack: () => void;
@@ -132,6 +134,15 @@ export function GrammarQuiz({ onBack }: GrammarQuizProps) {
       });
     } else {
       setStreak(0);
+      // Persist the mistake for weakness analysis
+      recordMistake({
+        type: 'grammar',
+        level: loadActiveLevel(),
+        question: question.sentence,
+        correct: question.correct,
+        wrong: option,
+        category: question.category,
+      });
     }
     setCategoryScores(prev => {
       const cat = question.category;
@@ -343,6 +354,7 @@ export function GrammarQuiz({ onBack }: GrammarQuizProps) {
         <AnswerFeedback
           isCorrect={isCorrect}
           correctAnswer={`${question.correct} — ${question.explanation}`}
+          correctAnswerEn={question.explanationEn}
           onContinue={handleContinue}
         />
       )}

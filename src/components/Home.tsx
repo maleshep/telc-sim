@@ -14,10 +14,11 @@ interface HomeProps {
   tests: TelcTest[];
   level: ExamLevel;
   onLevelChange: (l: ExamLevel) => void;
-  onStartExam: (testId: number) => void;
+  onStartExam: () => void;        // goes to ExamPicker
   onPractice: (testId: number, section: Section) => void;
   onStudy: () => void;
   onHistory: () => void;
+  onWeakness: () => void;
 }
 
 // What each section weakness actually means for the learner
@@ -50,8 +51,8 @@ const SECTION_ICON_BG: Record<string, string> = {
   sprechen: 'bg-telc',
 };
 
-export function Home({ tests, level, onLevelChange, onStartExam, onPractice, onStudy, onHistory }: HomeProps) {
-  const [selectedTest, setSelectedTest] = useState(tests[0]?.id ?? 1);
+export function Home({ tests, level, onLevelChange, onStartExam, onPractice, onStudy, onHistory, onWeakness }: HomeProps) {
+  const [selectedTest] = useState(tests[0]?.id ?? 1);
   const tts = isTTSAvailable();
   const stt = isSTTAvailable();
   const llm = isLLMConfigured();
@@ -171,11 +172,11 @@ export function Home({ tests, level, onLevelChange, onStartExam, onPractice, onS
           </div>
         )}
 
-        {/* Full exam start — test selector embedded inline */}
-        {tests.length > 0 && <div className="fade-in space-y-2">
+        {/* Prüfungsmodus — no test selector here, that's in ExamPicker */}
+        {tests.length > 0 && (
           <button
-            onClick={() => onStartExam(selectedTest)}
-            className="btn-3d btn-3d-primary w-full !py-5 !px-6 !rounded-2xl !text-lg group"
+            onClick={onStartExam}
+            className="btn-3d btn-3d-primary w-full !py-5 !px-6 !rounded-2xl !text-lg group fade-in"
           >
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-4">
@@ -184,29 +185,15 @@ export function Home({ tests, level, onLevelChange, onStartExam, onPractice, onS
                 </div>
                 <div className="text-left">
                   <div className="font-extrabold text-lg">Prüfungsmodus</div>
-                  <div className="text-sm text-white/70 font-normal">Alle 4 Teile — mit Zeitlimit</div>
+                  <div className="text-sm text-white/70 font-normal">
+                    {tests.length} {tests.length === 1 ? 'Test' : 'Tests'} verfügbar — alle 4 Teile
+                  </div>
                 </div>
               </div>
               <Play size={22} className="shrink-0 group-hover:translate-x-0.5 transition-transform" />
             </div>
           </button>
-          {/* Compact test selector — only relevant here */}
-          <div className="flex gap-1.5 justify-center pt-0.5">
-            {tests.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setSelectedTest(t.id)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  selectedTest === t.id
-                    ? 'bg-telc/15 text-telc border-2 border-telc/30'
-                    : 'bg-white text-gray-400 border-2 border-card-border hover:border-telc/30 hover:text-telc'
-                }`}
-              >
-                {t.name}
-              </button>
-            ))}
-          </div>
-        </div>}
+        )}
 
         {/* Section browser (Übungsmodus) */}
         <section className="fade-in">
@@ -235,7 +222,7 @@ export function Home({ tests, level, onLevelChange, onStartExam, onPractice, onS
           </div>
         </section>
 
-        {/* Weak area nudge — explains what is lacking, not just which section */}
+        {/* Weak area nudge — links to full weakness analysis */}
         {weakInfo && weakestSection && stats && (
           <div className="card !rounded-2xl p-4 !border-wrong/25 !bg-wrong/5 fade-in">
             <div className="flex items-center gap-3">
@@ -244,15 +231,15 @@ export function Home({ tests, level, onLevelChange, onStartExam, onPractice, onS
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-bold text-sm text-wrong">Verbesserungspotential — {weakInfo.label}</div>
-                <div className="text-xs text-gray-500 mt-0.5">
+                <div className="text-xs text-gray-500 mt-0.5 line-clamp-2">
                   {SECTION_WEAKNESSES[weakestSection]}
                 </div>
               </div>
               <button
-                onClick={() => onPractice(selectedTest, weakestSection)}
+                onClick={onWeakness}
                 className="btn-3d btn-3d-danger !py-1.5 !px-3 !text-xs shrink-0"
               >
-                Jetzt üben
+                Analyse
               </button>
             </div>
           </div>
