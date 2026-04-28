@@ -1,4 +1,4 @@
-// TELC A1 Exam data types
+// TELC Exam data types (multi-level)
 
 export interface HoerenItem {
   id: number;
@@ -52,6 +52,7 @@ export interface SprechenTeil {
 
 export interface TelcTest {
   id: number;
+  level: import('./levelConfig').ExamLevel;
   name: string;
   hoeren: { teil1: HoerenTeil; teil2: HoerenTeil; teil3: HoerenTeil };
   lesen: { teil1: LesenTeil; teil2: LesenTeil; teil3: LesenTeil };
@@ -80,6 +81,7 @@ export interface SectionScore {
 
 export interface ExamResult {
   testId: number;
+  level?: import('./levelConfig').ExamLevel;  // optional for backward compat
   sections: SectionScore[];
   totalPoints: number;
   maxPoints: number;

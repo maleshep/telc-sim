@@ -13,6 +13,7 @@ import { Study } from './components/Study';
 import { History } from './components/History';
 import { saveResult, savePracticeResult } from './history';
 import { WordLookupProvider } from './components/WordPopup';
+import { type ExamLevel, loadActiveLevel, saveActiveLevel } from './levelConfig';
 
 type Screen = 'home' | 'section-picker' | 'hoeren' | 'lesen' | 'schreiben' | 'sprechen' | 'scoring' | 'results' | 'study' | 'history';
 type Mode = 'exam' | 'practice';
@@ -34,7 +35,8 @@ function matchField(expected: string, actual: string): boolean {
 
 function App() {
   const [screen, setScreen] = useState<Screen>('home');
-  const [testId, setTestId] = useState(1);
+  const [level, setLevel] = useState<ExamLevel>(loadActiveLevel);
+  const [testId, setTestId] = useState<number | null>(null);
   const [mode, setMode] = useState<Mode>('practice');
   const [result, setResult] = useState<ExamResult | null>(null);
   const [practiceSection, setPracticeSection] = useState<Section>('hoeren');
@@ -42,7 +44,15 @@ function App() {
   const [abandonConfirm, setAbandonConfirm] = useState(false);
   const answersRef = useRef<Answer[]>([]);
 
-  const test = tests.find(t => t.id === testId) || tests[0];
+  // Tests available for the current level
+  const levelTests = tests.filter(t => t.level === level);
+  const test = tests.find(t => t.id === testId) ?? levelTests[0] ?? tests[0];
+
+  function handleLevelChange(l: ExamLevel) {
+    setLevel(l);
+    saveActiveLevel(l);
+    setTestId(null); // reset to first test of new level
+  }
 
   // ── Navigation ──────────────────────────────────────────────────
 
@@ -101,13 +111,14 @@ function App() {
 
     const practiceResult: ExamResult = {
       testId: test.id,
+      level,
       sections: [score],
       totalPoints: score.points,
       maxPoints: score.maxPoints,
       passed: score.passed,
       schreibenFeedback,
     };
-    savePracticeResult(practiceResult, section);
+    savePracticeResult(practiceResult, section, level);
     setResult(practiceResult);
     setScreen('results');
   }
@@ -126,13 +137,14 @@ function App() {
       if (mode === 'practice') {
         const practiceResult: ExamResult = {
           testId: test.id,
+          level,
           sections: [spScore],
           totalPoints: spScore.points,
           maxPoints: spScore.maxPoints,
           passed: spScore.passed,
           sprechenFeedback: spResult.feedback,
         };
-        savePracticeResult(practiceResult, 'sprechen');
+        savePracticeResult(practiceResult, 'sprechen', level);
         setResult(practiceResult);
         setScreen('results');
         return;
@@ -148,12 +160,12 @@ function App() {
       const maxPoints = sections.reduce((s, sec) => s + sec.maxPoints, 0);
 
       const examResult: ExamResult = {
-        testId: test.id, sections, totalPoints, maxPoints,
+        testId: test.id, level, sections, totalPoints, maxPoints,
         passed: totalPoints >= maxPoints * 0.6 && sections.every(s => s.passed),
         sprechenFeedback: spResult.feedback,
         schreibenFeedback: schreibenFeedback || undefined,
       };
-      saveResult(examResult);
+      saveResult(examResult, level);
       setResult(examResult);
       setScreen('results');
     } catch (err) {
@@ -285,7 +297,9 @@ function App() {
   if (screen === 'home') {
     return (
       <Home
-        tests={tests}
+        tests={levelTests}
+        level={level}
+        onLevelChange={handleLevelChange}
         onStartExam={handleStartExam}
         onPractice={handlePracticeSection}
         onStudy={() => setScreen('study')}
@@ -322,7 +336,7 @@ function App() {
       <Results
         result={result}
         mode={mode}
-        onRestart={mode === 'exam' ? () => handleStartExam(testId) : restartPractice}
+        onRestart={mode === 'exam' ? () => handleStartExam(testId ?? test.id) : restartPractice}
         onHome={goHome}
       />
     );

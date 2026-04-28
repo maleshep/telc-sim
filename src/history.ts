@@ -1,4 +1,6 @@
 import type { ExamResult, Section } from './types';
+import type { ExamLevel } from './levelConfig';
+import { ALL_LEVELS } from './levelConfig';
 
 const STORAGE_KEY = 'telc-a1-history';
 
@@ -7,6 +9,7 @@ export interface HistoryEntry {
   date: string;          // ISO string
   type: 'exam' | 'practice';
   section?: Section;     // only for practice entries
+  level?: ExamLevel;     // back-filled to 'A1' for old entries
   result: ExamResult;
 }
 
@@ -16,8 +19,12 @@ export function loadHistory(): HistoryEntry[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    // Back-fill type for entries saved before this field existed
-    return (parsed as HistoryEntry[]).map(e => ({ ...e, type: e.type ?? 'exam' }));
+    // Back-fill type/level for entries saved before these fields existed
+    return (parsed as HistoryEntry[]).map(e => ({
+      ...e,
+      type: e.type ?? 'exam',
+      level: e.level ?? (e.result?.level ?? 'A1'),
+    }));
   } catch {
     return [];
   }
@@ -37,11 +44,12 @@ function persist(history: HistoryEntry[]): void {
   }
 }
 
-export function saveResult(result: ExamResult): HistoryEntry {
+export function saveResult(result: ExamResult, level?: ExamLevel): HistoryEntry {
   const entry: HistoryEntry = {
     id: crypto.randomUUID(),
     date: new Date().toISOString(),
     type: 'exam',
+    level: level ?? result.level ?? 'A1',
     result,
   };
   const history = loadHistory();
@@ -50,12 +58,13 @@ export function saveResult(result: ExamResult): HistoryEntry {
   return entry;
 }
 
-export function savePracticeResult(result: ExamResult, section: Section): HistoryEntry {
+export function savePracticeResult(result: ExamResult, section: Section, level?: ExamLevel): HistoryEntry {
   const entry: HistoryEntry = {
     id: crypto.randomUUID(),
     date: new Date().toISOString(),
     type: 'practice',
     section,
+    level: level ?? result.level ?? 'A1',
     result,
   };
   const history = loadHistory();
@@ -126,4 +135,32 @@ export function computeStats(entries: HistoryEntry[]): HistoryStats | null {
     bestScore,
     sectionAvg,
   };
+}
+
+export interface LevelProgress {
+  level: ExamLevel;
+  tests: number;        // full exams taken
+  passRate: number;     // 0–100
+  avgPct: number;       // 0–100
+  badge: 'none' | 'in-progress' | 'passed';  // 'passed' = ≥80% pass rate on ≥3 exams
+}
+
+/** Returns progress for every level based on full exam history only. */
+export function computeLevelProgress(entries: HistoryEntry[]): Record<ExamLevel, LevelProgress> {
+  const result = {} as Record<ExamLevel, LevelProgress>;
+  for (const lv of ALL_LEVELS) {
+    const lvEntries = entries.filter(e => (e.level ?? 'A1') === lv && e.type === 'exam');
+    const tests = lvEntries.length;
+    const passed = lvEntries.filter(e => e.result.passed).length;
+    const passRate = tests > 0 ? (passed / tests) * 100 : 0;
+    const avgPct = tests > 0
+      ? lvEntries.reduce((s, e) => s + (e.result.maxPoints > 0 ? (e.result.totalPoints / e.result.maxPoints) * 100 : 0), 0) / tests
+      : 0;
+    const badge: LevelProgress['badge'] =
+      tests === 0 ? 'none'
+      : tests >= 3 && passRate >= 80 ? 'passed'
+      : 'in-progress';
+    result[lv] = { level: lv, tests, passRate, avgPct, badge };
+  }
+  return result;
 }

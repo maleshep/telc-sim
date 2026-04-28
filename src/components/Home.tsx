@@ -3,19 +3,30 @@ import type { TelcTest, Section } from '../types';
 import {
   Headphones, BookOpen, PenTool, MessageSquare,
   ChevronRight, Play, BookMarked, GraduationCap, Languages,
-  Sparkles, Award, AlertCircle,
+  Sparkles, Award, AlertCircle, TrendingUp, CheckCircle2, Lock,
 } from 'lucide-react';
 import { isTTSAvailable, isSTTAvailable, isUsingFallbackTTS } from '../speech';
 import { isLLMConfigured } from '../llm';
-import { loadHistory, computeStats } from '../history';
+import { loadHistory, computeStats, computeLevelProgress } from '../history';
+import { type ExamLevel, ALL_LEVELS, LEVEL_CONFIGS } from '../levelConfig';
 
 interface HomeProps {
   tests: TelcTest[];
+  level: ExamLevel;
+  onLevelChange: (l: ExamLevel) => void;
   onStartExam: (testId: number) => void;
   onPractice: (testId: number, section: Section) => void;
   onStudy: () => void;
   onHistory: () => void;
 }
+
+// What each section weakness actually means for the learner
+const SECTION_WEAKNESSES: Record<string, string> = {
+  hoeren: 'Du übersiehst oft Detailangaben in kurzen Dialogen. Übe aktives Zuhören — konzentriere dich auf Zahlen, Orte und Zeitangaben.',
+  lesen: 'Du hast Schwierigkeiten, gezielt Informationen in Texten zu finden. Übe das schnelle Scannen nach Schlüsselwörtern.',
+  schreiben: 'Deine Texte enthalten noch grammatische oder formale Fehler. Achte auf Satzstruktur, Verbendungen und Satzzeichen.',
+  sprechen: 'Du zögerst bei spontanen Antworten oder verwendest zu einfache Strukturen. Übe freies Sprechen zu Alltagsthemen.',
+};
 
 const SECTION_INFO: {
   key: Section;
@@ -39,13 +50,15 @@ const SECTION_ICON_BG: Record<string, string> = {
   sprechen: 'bg-telc',
 };
 
-export function Home({ tests, onStartExam, onPractice, onStudy, onHistory }: HomeProps) {
+export function Home({ tests, level, onLevelChange, onStartExam, onPractice, onStudy, onHistory }: HomeProps) {
   const [selectedTest, setSelectedTest] = useState(tests[0]?.id ?? 1);
   const tts = isTTSAvailable();
   const stt = isSTTAvailable();
   const llm = isLLMConfigured();
   const history = loadHistory();
-  const stats = computeStats(history);
+  const stats = computeStats(history.filter(e => (e.level ?? 'A1') === level));
+  const levelProgress = computeLevelProgress(history);
+  const cfg = LEVEL_CONFIGS[level];
 
   // Find the single weakest section (lowest pass rate, below 60%)
   const weakestSection = (() => {
@@ -61,24 +74,70 @@ export function Home({ tests, onStartExam, onPractice, onStudy, onHistory }: Hom
   return (
     <div className="min-h-dvh flex flex-col bg-exam-bg">
       {/* Hero Header */}
-      <header className="bg-gradient-to-br from-telc via-telc-dark to-telc-darker text-white py-10 px-6 text-center relative overflow-hidden">
+      <header className="bg-gradient-to-br from-telc via-telc-dark to-telc-darker text-white py-8 px-6 text-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-4 left-8 w-24 h-24 rounded-full bg-white/20 blur-xl" />
           <div className="absolute bottom-2 right-12 w-32 h-32 rounded-full bg-white/15 blur-2xl" />
         </div>
         <div className="relative">
-          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-sm font-semibold px-4 py-1.5 rounded-full mb-3">
             <Sparkles size={14} />
             Prüfungssimulator
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            telc Deutsch A1
+            {cfg.name}
           </h1>
-          <p className="mt-2 text-white/70 text-sm">
-            Bereite dich auf die Prüfung vor — mit KI-gestützter Bewertung
+          <p className="mt-1.5 text-white/70 text-sm">
+            {cfg.subtitle} — Bereite dich auf die Prüfung vor
           </p>
         </div>
       </header>
+
+      {/* Level progression strip */}
+      <div className="bg-white border-b-2 border-card-border px-4 py-3">
+        <div className="max-w-3xl mx-auto flex items-center gap-2">
+          <TrendingUp size={14} className="text-gray-400 shrink-0" />
+          <div className="flex flex-1 items-center gap-1.5">
+            {ALL_LEVELS.map((lv, i) => {
+              const lc = LEVEL_CONFIGS[lv];
+              const prog = levelProgress[lv];
+              const isActive = lv === level;
+              const isUnlocked = i === 0 || levelProgress[ALL_LEVELS[i - 1]].badge === 'passed';
+              return (
+                <div key={lv} className="flex items-center flex-1 min-w-0">
+                  <button
+                    onClick={() => onLevelChange(lv)}
+                    className={`flex-1 flex flex-col items-center py-1.5 px-2 rounded-xl transition-all ${
+                      isActive
+                        ? `${lc.bgLight} border-2 ${lc.borderClass}`
+                        : 'hover:bg-exam-bg border-2 border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1">
+                      {prog.badge === 'passed' ? (
+                        <CheckCircle2 size={12} className={lc.colorClass} />
+                      ) : !isUnlocked ? (
+                        <Lock size={11} className="text-gray-300" />
+                      ) : null}
+                      <span className={`text-xs font-extrabold ${isActive ? lc.colorClass : prog.badge === 'passed' ? lc.colorClass : 'text-gray-400'}`}>
+                        {lv}
+                      </span>
+                    </div>
+                    {prog.tests > 0 ? (
+                      <span className="text-[10px] font-bold text-gray-400">{Math.round(prog.passRate)}%</span>
+                    ) : (
+                      <span className="text-[10px] font-medium text-gray-300">—</span>
+                    )}
+                  </button>
+                  {i < ALL_LEVELS.length - 1 && (
+                    <div className={`w-4 h-px shrink-0 ${levelProgress[lv].badge === 'passed' ? 'bg-correct' : 'bg-gray-200'}`} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6 space-y-6">
         {/* Capability checks */}
@@ -100,8 +159,20 @@ export function Home({ tests, onStartExam, onPractice, onStudy, onHistory }: Hom
           </span>
         </div>
 
+        {/* No tests for this level yet */}
+        {tests.length === 0 && (
+          <div className="card !rounded-2xl p-8 text-center fade-in !border-dashed">
+            <div className="text-4xl mb-3">🚧</div>
+            <div className="font-extrabold text-gray-600 mb-1">{cfg.label} — Inhalt folgt bald</div>
+            <div className="text-sm text-gray-400">
+              Prüfungsfragen für {cfg.name} werden gerade erstellt.
+              In der Zwischenzeit kannst du im Lernmaterial üben.
+            </div>
+          </div>
+        )}
+
         {/* Full exam start — test selector embedded inline */}
-        <div className="fade-in space-y-2">
+        {tests.length > 0 && <div className="fade-in space-y-2">
           <button
             onClick={() => onStartExam(selectedTest)}
             className="btn-3d btn-3d-primary w-full !py-5 !px-6 !rounded-2xl !text-lg group"
@@ -135,7 +206,7 @@ export function Home({ tests, onStartExam, onPractice, onStudy, onHistory }: Hom
               </button>
             ))}
           </div>
-        </div>
+        </div>}
 
         {/* Section browser (Übungsmodus) */}
         <section className="fade-in">
@@ -164,17 +235,17 @@ export function Home({ tests, onStartExam, onPractice, onStudy, onHistory }: Hom
           </div>
         </section>
 
-        {/* Weak area nudge — shown only when there's a section below 60% pass rate */}
-        {weakInfo && weakestSection && (
+        {/* Weak area nudge — explains what is lacking, not just which section */}
+        {weakInfo && weakestSection && stats && (
           <div className="card !rounded-2xl p-4 !border-wrong/25 !bg-wrong/5 fade-in">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-wrong/10 flex items-center justify-center shrink-0">
                 <AlertCircle size={20} className="text-wrong" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-bold text-sm text-wrong">Schwachstelle: {weakInfo.label}</div>
+                <div className="font-bold text-sm text-wrong">Verbesserungspotential — {weakInfo.label}</div>
                 <div className="text-xs text-gray-500 mt-0.5">
-                  {Math.round(stats!.sectionAvg[weakestSection].passRate)}% Bestehensquote — noch Verbesserungspotential
+                  {SECTION_WEAKNESSES[weakestSection]}
                 </div>
               </div>
               <button
@@ -238,7 +309,7 @@ export function Home({ tests, onStartExam, onPractice, onStudy, onHistory }: Hom
             ))}
           </div>
           <div className="text-xs text-gray-400 text-center mt-4 pt-3 border-t border-card-border">
-            60 Punkte gesamt — bestanden ab 36 Punkten (60%)
+            {cfg.maxPoints} Punkte gesamt — bestanden ab {cfg.passPoints} Punkten (60%)
           </div>
         </section>
 
