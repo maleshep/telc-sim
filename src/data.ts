@@ -1,6 +1,8 @@
 import type { TelcTest } from './types';
+import { testsA2 } from './data-a2';
+import { testsB1 } from './data-b1';
 
-export const tests: TelcTest[] = [
+const testsA1: TelcTest[] = [
   // ============================================================
   //  TEST 1 — A1
   // ============================================================
@@ -929,3 +931,6 @@ export const tests: TelcTest[] = [
     },
   },
 ];
+
+// All tests across all levels
+export const tests: TelcTest[] = [...testsA1, ...testsA2, ...testsB1];

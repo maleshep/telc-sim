@@ -1,0 +1,951 @@
+import type { TelcTest } from './types';
+
+export const testsB1: TelcTest[] = [
+  // ============================================================
+  //  B1 TEST 1
+  // ============================================================
+  {
+    id: 7,
+    level: 'B1',
+    name: 'Übungstest 1',
+    hoeren: {
+      teil1: {
+        instruction: 'Sie hören fünf kurze Texte aus dem Radio. Zu jedem Text gibt es eine Aufgabe. Kreuzen Sie die richtige Antwort an. Sie hören jeden Text zweimal.',
+        replays: 2,
+        items: [
+          {
+            id: 1,
+            context: 'Nachrichtenmeldung',
+            audio: 'Die Bundesregierung hat heute ein neues Klimaschutzpaket verabschiedet. Das Paket sieht unter anderem eine stärkere Förderung von Elektroautos und eine Erhöhung des CO2-Preises ab dem nächsten Jahr vor. Umweltverbände begrüßen die Maßnahmen, fordern aber weitergehende Schritte. Die Opposition kritisiert die hohen Kosten für Verbraucher.',
+            question: 'Was beinhaltet das Klimaschutzpaket?',
+            options: ['a) Günstigere Benzinpreise und mehr Autobahnen', 'b) Förderung von Elektroautos und höherer CO2-Preis', 'c) Subventionen für die Kohleenergie'],
+            correct: 'b',
+          },
+          {
+            id: 2,
+            context: 'Verkehrshinweis',
+            audio: 'Achtung, Verkehrshinweis für die Autobahn A9 Richtung München: Zwischen dem Autobahnkreuz Nürnberg-Ost und der Ausfahrt Ingolstadt-Nord kommt es aufgrund eines Unfalls zu erheblichen Stauungen. Die Polizei empfiehlt, die Umleitung über die Bundesstraße 13 zu nehmen. Die Sperrung dauert voraussichtlich noch zwei Stunden.',
+            question: 'Warum gibt es Stau auf der A9?',
+            options: ['a) Wegen Bauarbeiten', 'b) Wegen eines Unfalls', 'c) Wegen einer Veranstaltung'],
+            correct: 'b',
+          },
+          {
+            id: 3,
+            context: 'Kulturnachrichten',
+            audio: 'Der diesjährige Deutsche Buchpreis geht an die Autorin Lena Hoffmann für ihren Roman "Zwischenwelten". Die Jury lobte besonders die eindrucksvolle Sprache und die tiefgründige Auseinandersetzung mit dem Thema Migration und Identität. Hoffmann erhält ein Preisgeld von fünfzehntausend Euro. Die Verleihung findet morgen Abend im Römer in Frankfurt statt.',
+            question: 'Wofür wurde Lena Hoffmann ausgezeichnet?',
+            options: ['a) Für ein Sachbuch über Geschichte', 'b) Für einen Roman über Migration und Identität', 'c) Für ihr Lebenswerk als Schriftstellerin'],
+            correct: 'b',
+          },
+          {
+            id: 4,
+            context: 'Wirtschaftsnachrichten',
+            audio: 'Die Arbeitslosenquote in Deutschland ist im September leicht gestiegen. Sie liegt nun bei fünf Komma vier Prozent, nach fünf Komma zwei Prozent im August. Experten führen den Anstieg auf die schwächelnde Konjunktur in der Industrie zurück. Besonders der Automobilsektor verzeichnet einen Stellenabbau. Dienstleistungsbranchen wie IT und Pflege suchen hingegen weiterhin dringend Fachkräfte.',
+            question: 'Warum ist die Arbeitslosigkeit gestiegen?',
+            options: ['a) Wegen weniger Touristen', 'b) Wegen der Konjunkturschwäche in der Industrie', 'c) Wegen neuer Steuergesetze'],
+            correct: 'b',
+          },
+          {
+            id: 5,
+            context: 'Gesundheitsmeldung',
+            audio: 'Laut einer neuen Studie des Robert Koch-Instituts schlafen rund dreißig Prozent der Deutschen chronisch zu wenig. Als ausreichend gelten sieben bis neun Stunden pro Nacht. Schlafmangel erhöht das Risiko für Herz-Kreislauf-Erkrankungen, Diabetes und Depressionen erheblich. Experten empfehlen, abends auf Bildschirme zu verzichten und regelmäßige Schlafzeiten einzuhalten.',
+            question: 'Was empfehlen Experten gegen Schlafmangel?',
+            options: ['a) Mehr Sport treiben', 'b) Schlaftabletten nehmen', 'c) Abends keine Bildschirme und regelmäßige Schlafzeiten'],
+            correct: 'c',
+          },
+        ],
+      },
+      teil2: {
+        instruction: 'Sie hören ein längeres Gespräch. Entscheiden Sie: richtig oder falsch?',
+        replays: 1,
+        items: [
+          {
+            id: 6,
+            context: 'Diskussion: Vor- und Nachteile der Digitalisierung im Bildungsbereich',
+            audio: 'Moderator: Herzlich willkommen zur heutigen Diskussion über Digitalisierung in der Schule. Ich begrüße Frau Professor Steinberg von der Universität Hamburg und Herrn Richter, Schulleiter einer Grundschule in München. Frau Professor, ist die Digitalisierung gut für unsere Kinder? Prof. Steinberg: Grundsätzlich ja. Digitale Medien können den Unterricht bereichern und individuelles Lernen ermöglichen. Aber die Qualität der Nutzung ist entscheidend — ein Tablet im Unterricht allein macht noch keinen guten Unterricht. Herr Richter: Ich sehe das ähnlich. Wir haben in unserer Schule Tablets eingeführt, aber wir mussten die Lehrer erst intensiv schulen. Das hat zwei Jahre gedauert. Moderator: Welche konkreten Vorteile haben Sie bemerkt? Herr Richter: Die Schüler sind motivierter. Und wir können Lerninhalte individuell anpassen — Kinder, die schneller lernen, bekommen schwierigere Aufgaben, langsamere Lerner bekommen mehr Unterstützung. Prof. Steinberg: Wichtig ist aber auch, dass wir digitale Kompetenz explizit unterrichten — also wie man seriöse Quellen erkennt, wie man Informationen bewertet. Das wird oft vernachlässigt. Moderator: Was ist mit den Risiken — Ablenkung, Social Media? Herr Richter: Das ist real. Wir haben strenge Regeln: Während des Unterrichts sind soziale Netzwerke gesperrt. Moderator: Und zu Hause? Herr Richter: Da haben wir wenig Einfluss. Eltern müssen Grenzen setzen.',
+            question: 'Prof. Steinberg findet Digitalisierung in der Schule grundsätzlich gut.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 7,
+            question: 'Die Einführung der Tablets in Herrn Richters Schule dauerte zwei Jahre Vorbereitung.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 8,
+            question: 'Digitale Geräte ermöglichen es, Lerninhalte individuell anzupassen.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 9,
+            question: 'Soziale Netzwerke sind in Herrn Richters Schule während des Unterrichts erlaubt.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+          {
+            id: 10,
+            question: 'Die Schule hat großen Einfluss auf den Medienkonsum der Schüler zu Hause.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+        ],
+      },
+      teil3: {
+        instruction: 'Sie hören ein Interview. Zu jedem Punkt gibt es eine Aufgabe. Kreuzen Sie an.',
+        replays: 1,
+        items: [
+          {
+            id: 11,
+            context: 'Interview mit einer Unternehmensberaterin über Work-Life-Balance',
+            audio: 'Journalistin: Frau Dr. Meier, Sie beraten Unternehmen in Sachen Work-Life-Balance. Was ist das häufigste Problem, das Sie sehen? Dr. Meier: Die meisten Mitarbeiter fühlen sich von ihrer Arbeit überwältigt und haben das Gefühl, nie wirklich abschalten zu können. Smartphones sind eigentlich praktisch, aber sie bedeuten auch, dass man theoretisch rund um die Uhr erreichbar ist. Journalistin: Wie kann man das ändern? Dr. Meier: Zunächst braucht es klare Regeln im Unternehmen — zum Beispiel keine E-Mails nach achtzehn Uhr. Aber genauso wichtig ist das persönliche Verhalten. Man muss lernen, Grenzen zu setzen und auch mal Nein zu sagen. Journalistin: Sind vier-Tage-Wochen die Lösung? Dr. Meier: Sie können helfen, aber nur wenn die gleiche Arbeit in weniger Zeit erledigt wird — nicht wenn man in vier Tagen fünf Tage Arbeit reinpackt. Einige Unternehmen haben gute Erfahrungen gemacht, andere nicht. Es hängt sehr von der Branche und der Unternehmenskultur ab. Journalistin: Was können Arbeitnehmer selbst tun? Dr. Meier: Prioritäten setzen, Aufgaben delegieren und — das klingt simpel, ist aber schwer — nach der Arbeit wirklich abschalten. Sport, Hobbys, Zeit mit Familie und Freunden — das sind keine Luxusgüter, sondern notwendig für langfristige Leistungsfähigkeit.',
+            question: 'Was ist laut Dr. Meier das häufigste Problem der Mitarbeiter?',
+            options: ['a) Sie verdienen zu wenig', 'b) Sie können nicht abschalten', 'c) Sie haben schlechte Kollegen'],
+            correct: 'b',
+          },
+          {
+            id: 12,
+            question: 'Welche Regel schlägt Dr. Meier für Unternehmen vor?',
+            options: ['a) Kürzere Meetings', 'b) Keine E-Mails nach 18 Uhr', 'c) Homeoffice für alle'],
+            correct: 'b',
+          },
+          {
+            id: 13,
+            question: 'Was ist das Problem bei Vier-Tage-Wochen laut Dr. Meier?',
+            options: ['a) Sie kosten zu viel', 'b) Kunden mögen sie nicht', 'c) Manchmal wird fünf Tage Arbeit in vier Tagen gepackt'],
+            correct: 'c',
+          },
+          {
+            id: 14,
+            question: 'Was empfiehlt Dr. Meier Arbeitnehmern persönlich?',
+            options: ['a) Mehr Überstunden um schneller aufzusteigen', 'b) Den Job wechseln', 'c) Prioritäten setzen und nach der Arbeit abschalten'],
+            correct: 'c',
+          },
+          {
+            id: 15,
+            question: 'Wie bezeichnet Dr. Meier Sport und Hobbys?',
+            options: ['a) Als unnötige Ablenkung', 'b) Als notwendig für langfristige Leistungsfähigkeit', 'c) Als wichtiger als die Arbeit'],
+            correct: 'b',
+          },
+        ],
+      },
+    },
+    lesen: {
+      teil1: {
+        instruction: 'Lesen Sie die Texte. Welche Antwort passt?',
+        items: [
+          {
+            id: 1,
+            text: 'PRESSEMITTEILUNG: Die Stadt München plant eine neue Radschnellverbindung zwischen der Innenstadt und dem südlichen Stadtrand. Das 12 Kilometer lange Projekt soll bis 2027 fertiggestellt sein und Pendlern eine schnelle, sichere Alternative zum Auto bieten. Investitionsvolumen: 45 Millionen Euro. Das Projekt wird zu 60% vom Bund gefördert.',
+            question: 'Was plant die Stadt München?',
+            options: ['a) Eine neue U-Bahn-Linie', 'b) Eine schnelle Radverbindung zwischen Innenstadt und Stadtrand', 'c) Eine Erweiterung der Autobahn'],
+            correct: 'b',
+          },
+          {
+            id: 2,
+            text: 'Sehr geehrte Damen und Herren, ich möchte mich auf die ausgeschriebene Stelle als Marketingleiterin bewerben. Ich verfüge über sechs Jahre Berufserfahrung im digitalen Marketing und habe zuletzt ein Team von zwölf Personen geführt. Besondere Stärken liegen in der Konzeption von Social-Media-Kampagnen und der Analyse von Kundendaten. Ich bin überzeugt, dass ich Ihre Erwartungen übertreffen werde. Mit freundlichen Grüßen, Sabrina Koch',
+            question: 'Wofür bewirbt sich Frau Koch?',
+            options: ['a) Für eine Stelle in der IT-Abteilung', 'b) Für die Position als Marketingleiterin', 'c) Für ein Praktikum im Marketing'],
+            correct: 'b',
+          },
+          {
+            id: 3,
+            text: 'MIETRECHT: Vermieter dürfen die Miete unter bestimmten Voraussetzungen erhöhen. Eine Erhöhung ist zulässig, wenn sie die ortsübliche Vergleichsmiete nicht übersteigt und die letzte Erhöhung mindestens 15 Monate zurückliegt. Die Erhöhung darf innerhalb von drei Jahren höchstens 20% betragen (in angespannten Wohnungsmärkten 15%). Mieter müssen der Erhöhung nicht sofort zustimmen — sie haben eine Überlegungsfrist von zwei Monaten.',
+            question: 'Wie lange haben Mieter Zeit, über eine Mieterhöhung nachzudenken?',
+            options: ['a) Einen Monat', 'b) Zwei Monate', 'c) Drei Monate'],
+            correct: 'b',
+          },
+          {
+            id: 4,
+            text: 'BUCHREZENSION: "Das stille Wasser" von Anna Brandt\nAnna Brandts dritter Roman ist ein meisterhaft erzähltes Psychodrama, das den Leser von der ersten bis zur letzten Seite fesselt. Die Geschichte einer Frau, die nach zwanzig Jahren in ihre Heimatstadt zurückkehrt und mit ihrer Vergangenheit konfrontiert wird, ist berührend und nachdenklich stimmend. Brandts Sprache ist präzise und bildreich. Einziger Kritikpunkt: Das Ende bleibt bewusst offen und mag nicht alle Leser zufriedenstellen. Empfehlenswert für Leser, die psychologisch komplexe Charakterstudien schätzen.',
+            question: 'Was ist der einzige Kritikpunkt an dem Roman?',
+            options: ['a) Die Sprache ist zu schwierig', 'b) Das Ende ist offen und löst nicht alles auf', 'c) Die Geschichte ist zu langsam'],
+            correct: 'b',
+          },
+          {
+            id: 5,
+            text: 'FORSCHUNGSERGEBNISSE: Wissenschaftler der Technischen Universität Berlin haben eine neue Methode entwickelt, mit der Plastik aus Meeresgewässern effizienter entfernt werden kann. Das System nutzt Strömungsdaten und künstliche Intelligenz, um Plastiksammlungsroboter optimal zu steuern. In Feldversuchen konnte die Effizienz gegenüber herkömmlichen Methoden um 300% gesteigert werden. Das Projekt wurde mit einem Innovationspreis ausgezeichnet.',
+            question: 'Was haben Wissenschaftler entwickelt?',
+            options: ['a) Einen neuen Kunststoff, der sich auflöst', 'b) Ein effizienteres System zum Entfernen von Plastik aus dem Meer', 'c) Eine Methode zur Plastikproduktion ohne Rohöl'],
+            correct: 'b',
+          },
+        ],
+      },
+      teil2: {
+        instruction: 'Lesen Sie den Text. Richtig oder falsch?',
+        items: [
+          {
+            id: 6,
+            text: 'KOLUMNE: Warum ich das Fliegen aufgegeben habe\nVor drei Jahren habe ich beschlossen, nicht mehr zu fliegen. Nicht weil ich nicht reisen möchte — im Gegenteil, ich liebe es, neue Orte zu entdecken. Sondern weil ich die Konsequenzen meines Handelns ernst nehme. Ein Flug von München nach New York erzeugt pro Person etwa 2,8 Tonnen CO2 — das entspricht dem, was ein Durchschnittsdeutscher im ganzen Jahr mit Autofahren verursacht.\nSeitdem erkunde ich Europa mit dem Zug. Zugfahrten sind zwar länger, aber ich habe gelernt, die Zeit zu schätzen: Ich lese, schreibe, schaue aus dem Fenster. Letzte Jahr bin ich von München nach Lissabon gefahren — 36 Stunden, drei Umsteigepunkte. Es war wunderschön. Natürlich ist nicht für jeden diese Entscheidung möglich. Wer Familie im Ausland hat oder beruflich viel fliegen muss, steht vor anderen Herausforderungen. Aber für diejenigen, die die Wahl haben, lohnt es sich, die eigenen Gewohnheiten zu hinterfragen.',
+            question: 'Der Autor mag das Reisen nicht.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+          {
+            id: 7,
+            question: 'Ein Transatlantikflug erzeugt pro Person etwa 2,8 Tonnen CO2.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 8,
+            question: 'Der Autor findet Zugfahrten langweilig.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+          {
+            id: 9,
+            question: 'Die Reise von München nach Lissabon dauerte 36 Stunden.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 10,
+            question: 'Der Autor glaubt, dass jeder Mensch auf das Fliegen verzichten kann.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+        ],
+      },
+      teil3: {
+        instruction: 'Lesen Sie den Text. Welche Antwort passt?',
+        items: [
+          {
+            id: 11,
+            text: 'FREIWILLIGENARBEIT IN DEUTSCHLAND\nImmer mehr Deutsche engagieren sich ehrenamtlich. Laut einer aktuellen Studie sind etwa 28 Millionen Menschen in Deutschland freiwillig tätig — das entspricht rund 40 Prozent der Bevölkerung über 14 Jahre. Die beliebtesten Bereiche sind Sport und Bewegung, soziale Dienste sowie Kirche und Religion.\nWer sich ehrenamtlich engagiert, profitiert in mehrfacher Hinsicht: Studien zeigen, dass freiwillig Tätige zufriedener und gesünder sind als nicht Engagierte. Sie bauen soziale Kontakte auf und erwerben Kompetenzen, die auch im Berufsleben nützlich sein können. Für junge Menschen kann Ehrenamt sogar den Einstieg ins Berufsleben erleichtern — Arbeitgeber schätzen soziales Engagement.\nAllerdings zeigen Umfragen, dass die Haupthindernisse für Ehrenamt fehlendes Zeitgefühl und bürokratische Hürden sind. Viele potenzielle Freiwillige wissen auch nicht, wie sie anfangen sollen. Hier könnten Freiwilligenagenturen helfen, die Interessierte mit passenden Organisationen zusammenbringen.',
+            question: 'Wie viele Deutsche engagieren sich laut der Studie ehrenamtlich?',
+            options: ['a) Etwa 18 Millionen', 'b) Etwa 28 Millionen', 'c) Mehr als 40 Millionen'],
+            correct: 'b',
+          },
+          {
+            id: 12,
+            text: '',
+            question: 'Was ist der beliebteste Bereich für Ehrenamt?',
+            options: ['a) Kultur und Kunst', 'b) Umweltschutz', 'c) Sport und Bewegung'],
+            correct: 'c',
+          },
+          {
+            id: 13,
+            text: '',
+            question: 'Welche Vorteile bringt Ehrenamt den Freiwilligen?',
+            options: ['a) Finanzielle Vergütung', 'b) Gesundheit, Zufriedenheit und Kompetenzen', 'c) Steuerliche Vorteile'],
+            correct: 'b',
+          },
+          {
+            id: 14,
+            text: '',
+            question: 'Was sind die Haupthindernisse für Ehrenamt?',
+            options: ['a) Schlechte Bezahlung und mangelnde Anerkennung', 'b) Fehlende Zeit und bürokratische Hürden', 'c) Mangelnde Qualifikation'],
+            correct: 'b',
+          },
+          {
+            id: 15,
+            text: '',
+            question: 'Was machen Freiwilligenagenturen?',
+            options: ['a) Sie bezahlen Freiwillige', 'b) Sie bringen Interessierte mit Organisationen zusammen', 'c) Sie verwalten Spendengelder'],
+            correct: 'b',
+          },
+        ],
+      },
+    },
+    schreiben: {
+      teil1: {
+        instruction: 'Lesen Sie die Situation und schreiben Sie einen formellen Brief oder eine E-Mail.',
+        formTitle: 'Formeller Beschwerdebrief',
+        personCard: [
+          'Absender: Marcus Berger, Hauptstr. 5, 10115 Berlin',
+          'Empfänger: Kundenservice Telecom AG, Postfach 1234, 60000 Frankfurt',
+          'Betreff: Beschwerde über Netzausfall und fehlerhafte Rechnung',
+          'Vertragsnummer: TB-987654',
+          'Problem: Seit 3 Wochen schlechter Empfang, letzte Rechnung 45€ zu hoch',
+          'Forderung: Reparatur, Rückerstattung und Entschädigung',
+          'Datum: 15. Oktober',
+        ],
+        fields: [
+          { label: 'Anrede (formell)', answer: 'Sehr geehrte Damen und Herren', hint: 'Formeller Briefbeginn' },
+          { label: 'Betreff', answer: 'Beschwerde: Netzausfall und fehlerhafte Rechnung, Vertragsnr. TB-987654' },
+          { label: 'Hauptproblem (1 Satz)', answer: 'Seit drei Wochen habe ich kaum Netzempfang, und meine letzte Rechnung ist um 45 Euro zu hoch.' },
+          { label: 'Forderung', answer: 'Ich bitte um sofortige Behebung des Problems, Rückerstattung der 45 Euro und eine angemessene Entschädigung.' },
+          { label: 'Abschlussformel', answer: 'Mit freundlichen Grüßen' },
+        ],
+      },
+      teil2: {
+        instruction: 'Schreiben Sie einen Text zu einem der folgenden Themen.',
+        situation: 'Thema: "Städtisches Leben oder Leben auf dem Land — was ist besser?" Viele Menschen ziehen in die Stadt, andere möchten lieber auf dem Land leben. Schreiben Sie Ihren Standpunkt mit Argumenten.',
+        bullets: [
+          'Beschreiben Sie Ihre persönliche Präferenz (Stadt oder Land)',
+          'Nennen Sie mindestens zwei Vorteile Ihrer Wahl',
+          'Gehen Sie auf einen Nachteil ein und erklären Sie, warum dieser für Sie akzeptabel ist',
+          'Schließen Sie mit einer klaren Aussage ab',
+        ],
+        minWords: 80,
+      },
+    },
+    sprechen: {
+      teil1: {
+        teil: 1,
+        instruction: 'Präsentieren Sie ein Thema aus Ihrem Leben oder Ihrer Erfahrung.',
+        prompts: [
+          'Beschreiben Sie eine Reise, die Sie geprägt hat',
+          'Was haben Sie gesehen und erlebt?',
+          'Was haben Sie über sich selbst gelernt?',
+          'Würden Sie diesen Ort anderen empfehlen? Warum?',
+        ],
+        exampleResponse: 'Ich möchte über meine Reise nach... erzählen. Ich war dort für... und habe... gesehen. Was mich besonders beeindruckt hat, war... Ich habe dabei gelernt, dass... Ich würde diesen Ort empfehlen, weil...',
+      },
+      teil2: {
+        teil: 2,
+        instruction: 'Führen Sie ein Rollenspiel: Eine Person hat ein Problem, die andere bietet Lösungen an.',
+        prompts: [
+          'Ihr Freund hat seinen Job verloren und ist deprimiert',
+          'Bieten Sie drei konkrete Vorschläge an, wie er die Situation verbessern kann',
+          'Diskutieren Sie die Vor- und Nachteile jedes Vorschlags',
+          'Einigen Sie sich auf einen konkreten nächsten Schritt',
+        ],
+      },
+      teil3: {
+        teil: 3,
+        instruction: 'Diskutieren Sie ein gesellschaftliches Thema und äußern Sie Ihre Meinung.',
+        prompts: [
+          'Sollte das Wahlalter auf 16 Jahre gesenkt werden? Argumentation pro und kontra',
+          'Wie wichtig ist politische Bildung in der Schule?',
+          'Sind junge Menschen heute politisch aktiver als früher?',
+          'Was könnten Politiker tun, um mehr Jugendliche für Politik zu interessieren?',
+        ],
+      },
+    },
+  },
+
+  // ============================================================
+  //  B1 TEST 2
+  // ============================================================
+  {
+    id: 8,
+    level: 'B1',
+    name: 'Übungstest 2',
+    hoeren: {
+      teil1: {
+        instruction: 'Sie hören fünf kurze Nachrichten oder Ankündigungen. Kreuzen Sie die richtige Antwort an.',
+        replays: 2,
+        items: [
+          {
+            id: 1,
+            context: 'Ansage am Flughafen',
+            audio: 'Sehr geehrte Reisende, wir möchten Sie darauf hinweisen, dass der Flug LH 441 nach Wien heute mit einer Verspätung von circa neunzig Minuten starten wird. Der neue Abflugtermin ist zwanzig Uhr fünfundvierzig. Wir bedauern die Unannehmlichkeiten. Passagiere, die ihren Anschlussflug verpassen könnten, wenden sich bitte an unser Servicecenter in Halle B.',
+            question: 'Um wie viel Uhr startet der Flug nach Wien jetzt?',
+            options: ['a) Um 19:15 Uhr', 'b) Um 20:45 Uhr', 'c) Um 21:30 Uhr'],
+            correct: 'b',
+          },
+          {
+            id: 2,
+            context: 'Nachrichtenmeldung',
+            audio: 'Der Deutsche Bundestag hat heute mit großer Mehrheit das neue Lieferkettengesetz verabschiedet. Das Gesetz verpflichtet Unternehmen mit mehr als dreitausend Mitarbeitern, Menschenrechte und Umweltstandards in ihrer gesamten Lieferkette zu überprüfen. Bei Verstößen drohen Bußgelder von bis zu zwei Prozent des weltweiten Jahresumsatzes. Das Gesetz tritt am ersten Januar des nächsten Jahres in Kraft.',
+            question: 'Was regelt das neue Lieferkettengesetz?',
+            options: ['a) Kürzere Lieferzeiten für Verbraucher', 'b) Menschenrechts- und Umweltstandards in Lieferketten', 'c) Neue Zollregeln für Importe'],
+            correct: 'b',
+          },
+          {
+            id: 3,
+            context: 'Werbedurchsage im Supermarkt',
+            audio: 'Liebe Kundinnen und Kunden, heute und morgen haben Sie die Möglichkeit, bei unserer Jubiläumsaktion zu sparen. Bei einem Einkauf ab vierzig Euro erhalten Sie einen Rabattgutschein über fünf Euro für Ihren nächsten Einkauf. Außerdem sind diese Woche alle Bio-Produkte zwanzig Prozent günstiger. Das Angebot gilt nur, solange der Vorrat reicht.',
+            question: 'Was braucht man, um den Rabattgutschein zu bekommen?',
+            options: ['a) Eine Kundenkarte', 'b) Einen Einkauf ab 40 Euro', 'c) Den Kauf von Bio-Produkten'],
+            correct: 'b',
+          },
+          {
+            id: 4,
+            context: 'Kulturmeldung',
+            audio: 'Das Städtische Theater gibt bekannt, dass die geplante Uraufführung des Stücks "Morgen, vielleicht" auf den fünfzehnten März verschoben werden muss. Grund ist die Erkrankung des Hauptdarstellers. Bereits gekaufte Tickets behalten ihre Gültigkeit. Wer sein Ticket zurückgeben möchte, kann dies bis zum dreißigsten November an der Theaterkasse tun.',
+            question: 'Warum wird die Uraufführung verschoben?',
+            options: ['a) Das Stück braucht mehr Proben', 'b) Der Hauptdarsteller ist krank', 'c) Das Theater wird renoviert'],
+            correct: 'b',
+          },
+          {
+            id: 5,
+            context: 'Polizeidurchsage',
+            audio: 'Achtung, Durchsage der Polizei: Im Stadtpark werden zurzeit Taschendiebstähle gemeldet. Die Täter arbeiten in Gruppen und lenken ihre Opfer mit Fragen oder Zeitungen ab. Bitte achten Sie auf Ihre Wertsachen und tragen Sie Taschen und Rucksäcke vor dem Körper. Bei verdächtigen Personen wenden Sie sich an die Polizei unter dem Notruf 110.',
+            question: 'Wie gehen die Diebe laut der Durchsage vor?',
+            options: ['a) Sie brechen in Autos ein', 'b) Sie lenken ihre Opfer ab und stehlen dann', 'c) Sie nutzen gefälschte Ausweise'],
+            correct: 'b',
+          },
+        ],
+      },
+      teil2: {
+        instruction: 'Sie hören ein Gespräch. Richtig oder falsch?',
+        replays: 1,
+        items: [
+          {
+            id: 6,
+            context: 'Gespräch: Zwei Freunde diskutieren über vegane Ernährung',
+            audio: 'Julia: Ich esse jetzt seit sechs Monaten vegan. Ich fühle mich viel besser — mehr Energie, besserer Schlaf. Felix: Interessant. Aber ist das nicht super schwierig? Vor allem beim Einkaufen? Julia: Am Anfang schon. Ich musste lernen, Zutatenlisten zu lesen. Aber jetzt geht es automatisch. Felix: Und was ist mit Eiweiß? Bekommst du genug? Julia: Das ist ein häufiges Missverständnis. Man kann Eiweiß gut aus Hülsenfrüchten, Tofu und Nüssen bekommen. Ich nehme aber Vitamin-B12-Präparate, weil das in pflanzlicher Nahrung fehlt. Felix: Vermisst du Fleisch? Julia: Manchmal vermisse ich Käse. Fleisch eigentlich nicht mehr. Felix: Ich könnte mir das nicht vorstellen. Ich esse gerne Fleisch, aber ich versuche, seltener Fleisch zu kaufen und dafür auf Qualität zu achten. Julia: Das ist auch ein guter Ansatz. Jeder kann einen Beitrag leisten, wie er möchte.',
+            question: 'Julia ist seit sechs Monaten Veganerin.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 7,
+            question: 'Julia findet das Einkaufen immer noch schwierig.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+          {
+            id: 8,
+            question: 'Julia nimmt Vitamin-B12-Präparate.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 9,
+            question: 'Julia vermisst hauptsächlich Fleisch.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+          {
+            id: 10,
+            question: 'Felix hat beschlossen, vollständig auf Fleisch zu verzichten.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+        ],
+      },
+      teil3: {
+        instruction: 'Sie hören ein Interview. Zu jedem Punkt eine Aufgabe.',
+        replays: 1,
+        items: [
+          {
+            id: 11,
+            context: 'Interview mit einem Stadtplaner über die Stadt der Zukunft',
+            audio: 'Moderatorin: Herr Professor Koch, wie werden Städte in zwanzig Jahren aussehen? Prof. Koch: Die größte Herausforderung ist der Klimawandel. Städte müssen grüner werden — mehr Bäume, mehr Grünflächen, mehr Dachgärten. Das hilft gegen Hitzewellen und verbessert die Luftqualität. Moderatorin: Was ist mit dem Verkehr? Prof. Koch: Der private PKW wird weniger werden. Stattdessen werden wir mehr geteilte Fahrzeuge haben — Car-Sharing, autonome Shuttle-Busse. Und natürlich mehr Fahrradinfrastruktur. Moderatorin: Werden Städte größer oder kleiner? Prof. Koch: Beides gleichzeitig, paradoxerweise. Megastädte in Asien und Afrika wachsen weiter. Aber in Europa sehen wir einen Trend zu kleineren Städten und zur Rückkehr in ländlichere Gebiete — besonders seit der Pandemie und dem Homeoffice-Trend. Moderatorin: Was ist die wichtigste Investition, die Städte jetzt tätigen sollten? Prof. Koch: Digitale Infrastruktur. Schnelles Internet ist heute so wichtig wie Strom und Wasser. Ohne es können weder Wirtschaft noch Bildung noch Verwaltung modern funktionieren.',
+            question: 'Was ist laut Prof. Koch die größte Herausforderung für Städte?',
+            options: ['a) Bevölkerungswachstum', 'b) Der Klimawandel', 'c) Arbeitslosigkeit'],
+            correct: 'b',
+          },
+          {
+            id: 12,
+            question: 'Welchen Trend sieht Prof. Koch beim Verkehr?',
+            options: ['a) Mehr private Autos', 'b) Mehr Flugzeuge', 'c) Weniger private PKW, mehr geteilte Fahrzeuge'],
+            correct: 'c',
+          },
+          {
+            id: 13,
+            question: 'Was beobachtet Prof. Koch in Europa bei der Stadtgröße?',
+            options: ['a) Alle Städte wachsen stark', 'b) Einen Trend zu kleineren Städten und Landleben', 'c) Viele Menschen verlassen Europa'],
+            correct: 'b',
+          },
+          {
+            id: 14,
+            question: 'Was bezeichnet Prof. Koch als wichtigste Investition?',
+            options: ['a) Neue Schulen und Krankenhäuser', 'b) Digitale Infrastruktur und schnelles Internet', 'c) Mehr Parks und Grünflächen'],
+            correct: 'b',
+          },
+          {
+            id: 15,
+            question: 'Was hat den Trend zum Landleben in Europa verstärkt?',
+            options: ['a) Steigende Mieten', 'b) Homeoffice und die Pandemie', 'c) Bessere Schulen auf dem Land'],
+            correct: 'b',
+          },
+        ],
+      },
+    },
+    lesen: {
+      teil1: {
+        instruction: 'Lesen Sie die Texte. Welche Antwort passt?',
+        items: [
+          {
+            id: 1,
+            text: 'STELLENAUSSCHREIBUNG: Die Charité — Universitätsmedizin Berlin sucht zum nächstmöglichen Zeitpunkt eine/n Pflegefachkraft (m/w/d) für die Intensivstation. Voraussetzungen: Abgeschlossene Ausbildung als Pflegefachkraft, mindestens zwei Jahre Berufserfahrung, Bereitschaft zu Schichtdienst. Wir bieten: Tarifvergütung, betriebliche Altersvorsorge, Fort- und Weiterbildungsmöglichkeiten. Bewerbungen bis 30. November.',
+            question: 'Was wird für die Stelle zwingend vorausgesetzt?',
+            options: ['a) Ein Universitätsabschluss in Medizin', 'b) Mindestens zwei Jahre Berufserfahrung als Pflegekraft', 'c) Erfahrung auf der Kinderstation'],
+            correct: 'b',
+          },
+          {
+            id: 2,
+            text: 'Sehr geehrter Herr Müller, vielen Dank für Ihr Interesse an unserer Fortbildung "Projektmanagement Agil". Leider müssen wir Ihnen mitteilen, dass der Kurs aufgrund zu geringer Anmeldezahl auf den März des nächsten Jahres verschoben werden muss. Ihre Anmeldung bleibt selbstverständlich bestehen. Sollten Sie lieber stornieren wollen, erstatten wir die bereits geleistete Anzahlung vollständig. Bitte teilen Sie uns Ihre Entscheidung bis zum 15. Dezember mit. Mit freundlichen Grüßen, das Fortbildungszentrum',
+            question: 'Warum wird der Kurs verschoben?',
+            options: ['a) Der Trainer ist krank', 'b) Zu wenige Teilnehmer haben sich angemeldet', 'c) Die Räumlichkeiten werden renoviert'],
+            correct: 'b',
+          },
+          {
+            id: 3,
+            text: 'DATENSCHUTZ-INFO: Gemäß der EU-Datenschutzgrundverordnung (DSGVO) haben Sie das Recht, Auskunft über Ihre bei uns gespeicherten Daten zu erhalten, diese berichtigen oder löschen zu lassen sowie der Verarbeitung zu widersprechen. Alle Anfragen richten Sie bitte schriftlich an unseren Datenschutzbeauftragten: datenschutz@beispielfirma.de. Wir bearbeiten Ihre Anfrage innerhalb von dreißig Tagen.',
+            question: 'Welches Recht haben Nutzer laut dieser Information?',
+            options: ['a) Kostenlosen Zugang zu allen Firmendaten', 'b) Auskunft, Berichtigung und Löschung ihrer persönlichen Daten', 'c) Automatische Löschung nach einem Jahr'],
+            correct: 'b',
+          },
+          {
+            id: 4,
+            text: 'KOMMENTAR: Das Pflichtpraktikum — sinnvoll oder zeitverschwendung?\nViele Studiengänge verlangen ein Pflichtpraktikum. Die Idee dahinter ist gut: Theorie und Praxis sollen verknüpft werden. In der Realität sieht es jedoch oft anders aus: Studierende machen Kaffee, kopieren Dokumente und lernen wenig Relevantes. Besser wäre es, Unternehmen stärker in die Pflicht zu nehmen und sicherzustellen, dass Praktika echten Lernwert bieten.',
+            question: 'Was kritisiert der Autor am Pflichtpraktikum?',
+            options: ['a) Es dauert zu lange', 'b) Oft bietet es wenig echten Lernwert', 'c) Es ist zu gut bezahlt'],
+            correct: 'b',
+          },
+          {
+            id: 5,
+            text: 'VERANSTALTUNGSKALENDER: Internationales Filmfestival Mannheim-Heidelberg\n12.–22. November. Über 100 Filme aus 40 Ländern. Eröffnungsfilm: "Die letzten Tage des Winters" (Deutschland). Wettbewerb: Internationale Kurzfilme und Dokumentarfilme. Publikumspreis: Abstimmung täglich online. Tickets: Ab 9 Euro (Studierende: 6 Euro). Online-Buchung: www.ifm-h.de',
+            question: 'Was können Festivalgäste täglich tun?',
+            options: ['a) Kostenlos Filme sehen', 'b) Online für ihren Lieblingsfilm abstimmen', 'c) An Filmworkshops teilnehmen'],
+            correct: 'b',
+          },
+        ],
+      },
+      teil2: {
+        instruction: 'Lesen Sie den Text. Richtig oder falsch?',
+        items: [
+          {
+            id: 6,
+            text: 'REPORTAGE: Pendler in Deutschland\nIn Deutschland pendeln täglich rund dzehn Millionen Menschen zur Arbeit. Der durchschnittliche Pendler legt dabei eine Strecke von dreißig Kilometern zurück — eine Stunde pro Strecke. Das macht rund neunzig Arbeitstage im Jahr, die Pendler im Transit verbringen. Die meisten fahren mit dem Auto: 68 Prozent der Pendler nutzen täglich ihren PKW, trotz steigender Spritpreise. Nur 27 Prozent fahren mit öffentlichen Verkehrsmitteln.\nWas bedeutet das für die Lebensqualität? Studien zeigen: Lange Pendelzeiten sind einer der stärksten Faktoren für Unzufriedenheit im Berufsleben. Wer täglich mehr als neunzig Minuten pendelt, leidet häufiger unter Stress und schläft schlechter. Als Gegenmaßnahme setzen immer mehr Unternehmen auf hybrides Arbeiten — also die Kombination aus Büropräsenz und Homeoffice. Das kann Pendelzeiten halbieren und die Mitarbeiterzufriedenheit deutlich steigern.',
+            question: 'Etwa zehn Millionen Deutsche pendeln täglich zur Arbeit.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 7,
+            question: 'Die Mehrheit der Pendler nutzt öffentliche Verkehrsmittel.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+          {
+            id: 8,
+            question: 'Lange Pendelzeiten haben negative Auswirkungen auf die Gesundheit.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 9,
+            question: 'Hybrides Arbeiten kann die Pendelzeiten halbieren.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 10,
+            question: 'Pendler verbringen laut dem Text ungefähr neunzig Arbeitstage im Jahr im Transit.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+        ],
+      },
+      teil3: {
+        instruction: 'Lesen Sie den Text und beantworten Sie die Aufgaben.',
+        items: [
+          {
+            id: 11,
+            text: 'ESSAY: Mehrsprachigkeit als Stärke\nIn einer globalisierten Welt ist Mehrsprachigkeit eine der wertvollsten Fähigkeiten. Wer mehrere Sprachen spricht, hat nicht nur berufliche Vorteile — er denkt auch anders. Neurowissenschaftliche Studien zeigen, dass Mehrsprachige flexibler denken, besser zwischen Aufgaben wechseln können und im Alter einen besseren Schutz vor kognitiven Erkrankungen wie Demenz haben.\nIn Deutschland wird Mehrsprachigkeit oft noch als Ausnahme betrachtet. Dabei haben über 20 Prozent der Bevölkerung einen Migrationshintergrund und wachsen mit mindestens zwei Sprachen auf. Statt diese Ressource zu nutzen, werden Migrantensprachen in Schulen oft ignoriert oder sogar als störend empfunden.\nEin modernes Bildungssystem sollte Mehrsprachigkeit feiern und fördern — nicht nur Englisch als Fremdsprache, sondern alle Sprachen. Schulen könnten Schülerinnen und Schüler ermutigen, ihre Heimatsprachen einzubringen und als Brücke zu neuen Lernenden zu nutzen. Das würde nicht nur die sprachliche, sondern auch die soziale Integration stärken.',
+            question: 'Welchen beruflichen Vorteil bietet Mehrsprachigkeit laut dem Text?',
+            options: ['a) Höheres Gehalt', 'b) Bessere Karrierechancen in einer globalisierten Welt', 'c) Zugang zu mehr Bildungsabschlüssen'],
+            correct: 'b',
+          },
+          {
+            id: 12,
+            text: '',
+            question: 'Was zeigen neurowissenschaftliche Studien über Mehrsprachige?',
+            options: ['a) Sie schlafen besser', 'b) Sie sind flexibler im Denken und besser vor Demenz geschützt', 'c) Sie haben ein besseres Gedächtnis für Zahlen'],
+            correct: 'b',
+          },
+          {
+            id: 13,
+            text: '',
+            question: 'Wie wird Mehrsprachigkeit in Deutschland laut dem Autor oft gesehen?',
+            options: ['a) Als sehr positive Eigenschaft', 'b) Als unnötig und schwierig', 'c) Als Ausnahme, nicht als Norm'],
+            correct: 'c',
+          },
+          {
+            id: 14,
+            text: '',
+            question: 'Was sollte ein modernes Bildungssystem laut dem Autor tun?',
+            options: ['a) Nur Englisch fördern', 'b) Alle Sprachen fördern und Mehrsprachigkeit feiern', 'c) Migrantensprachen als Nebenfach anbieten'],
+            correct: 'b',
+          },
+          {
+            id: 15,
+            text: '',
+            question: 'Wie könnten Schüler ihre Heimatsprachen im Unterricht nutzen?',
+            options: ['a) Als Ersatz für Deutsch', 'b) Als Brücke für neue Lernende', 'c) In speziellen Muttersprachklassen'],
+            correct: 'b',
+          },
+        ],
+      },
+    },
+    schreiben: {
+      teil1: {
+        instruction: 'Schreiben Sie eine formelle E-Mail.',
+        formTitle: 'Formelle Anfrage',
+        personCard: [
+          'Absender: Petra Hoffmann, Goethestr. 45, 69120 Heidelberg',
+          'Empfänger: Volkshochschule Heidelberg',
+          'Zweck: Informationen über B2-Deutschkurs anfragen',
+          'Details: Kurszeiten (bevorzugt abends), Kosten, Vorkenntnisse nötig, Anmeldeverfahren',
+          'Besonderes: Hat B1-Zertifikat (Goethe Institut, 2022)',
+        ],
+        fields: [
+          { label: 'Anrede', answer: 'Sehr geehrte Damen und Herren' },
+          { label: 'Zweck der Anfrage (1 Satz)', answer: 'Ich möchte mich gerne über Ihren B2-Deutschkurs informieren.' },
+          { label: 'Wichtigste Frage', answer: 'Gibt es Abendkurse, und wie hoch sind die Kursgebühren?' },
+          { label: 'Qualifikation erwähnen', answer: 'Ich habe ein B1-Zertifikat vom Goethe Institut (2022).' },
+          { label: 'Abschlussformel', answer: 'Mit freundlichen Grüßen, Petra Hoffmann' },
+        ],
+      },
+      teil2: {
+        instruction: 'Verfassen Sie einen längeren Text zu folgendem Thema.',
+        situation: 'Thema: "Soziale Medien — Chance oder Risiko für die Gesellschaft?" Schreiben Sie Ihren Standpunkt mit Beispielen und begründeten Argumenten.',
+        bullets: [
+          'Formulieren Sie Ihre Hauptthese klar (Chance oder Risiko oder beides)',
+          'Nennen Sie zwei konkrete Vorteile sozialer Medien mit Beispielen',
+          'Diskutieren Sie zwei Risiken oder Nachteile',
+          'Schließen Sie mit Ihrer persönlichen Einschätzung und einem Ausblick ab',
+        ],
+        minWords: 100,
+      },
+    },
+    sprechen: {
+      teil1: {
+        teil: 1,
+        instruction: 'Beschreiben Sie ein Problem in Ihrem Alltag und wie Sie damit umgehen.',
+        prompts: [
+          'Was ist eine Herausforderung in Ihrem aktuellen Leben?',
+          'Wie sind Sie bisher damit umgegangen?',
+          'Was haben Sie dadurch gelernt?',
+          'Was würden Sie anderen empfehlen, die ähnliche Probleme haben?',
+        ],
+        exampleResponse: 'Eine große Herausforderung für mich ist... Das hat mir Schwierigkeiten bereitet, weil... Ich habe versucht, das Problem zu lösen, indem ich... Ich habe gelernt, dass...',
+      },
+      teil2: {
+        teil: 2,
+        instruction: 'Diskutieren Sie eine kontroverse Frage und vertreten Sie Ihren Standpunkt.',
+        prompts: [
+          'Sollte das Internet für Kinder unter 14 Jahren stärker reguliert werden?',
+          'Argumentieren Sie für oder gegen strengere Regeln',
+          'Berücksichtigen Sie die Gegenposition',
+          'Kommen Sie zu einem abschließenden Standpunkt',
+        ],
+      },
+      teil3: {
+        teil: 3,
+        instruction: 'Führen Sie ein formelles Gespräch.',
+        prompts: [
+          'Sie bewerben sich für eine Stelle als Deutschlehrer/in',
+          'Warum möchten Sie unterrichten?',
+          'Welche Erfahrungen haben Sie mit Kindern oder Erwachsenen?',
+          'Wie würden Sie schwierige Schüler motivieren?',
+        ],
+      },
+    },
+  },
+
+  // ============================================================
+  //  B1 TEST 3
+  // ============================================================
+  {
+    id: 9,
+    level: 'B1',
+    name: 'Übungstest 3',
+    hoeren: {
+      teil1: {
+        instruction: 'Sie hören fünf kurze Texte. Kreuzen Sie die richtige Antwort an.',
+        replays: 2,
+        items: [
+          {
+            id: 1,
+            context: 'Radiointerview',
+            audio: 'Moderator: Herr Fischer, Sie haben gerade Ihren vierhundertsten Marathonlauf absolviert. Was ist Ihr Geheimnis? Herr Fischer: Konsequenz. Ich laufe seit dreißig Jahren, und ich habe nie einen Marathon aufgehört, auch wenn der Körper geschmerzt hat. Das Wichtigste ist, sich realistische Ziele zu setzen. Moderator: Was raten Sie Anfängern? Herr Fischer: Langsam anfangen, auf den Körper hören und Geduld haben. Die meisten Anfänger geben auf, weil sie zu schnell zu viel wollen.',
+            question: 'Was rät Herr Fischer Marathonläufer-Anfängern?',
+            options: ['a) Täglich trainieren ohne Pause', 'b) Langsam anfangen und Geduld haben', 'c) Sofort einen Marathon anmelden'],
+            correct: 'b',
+          },
+          {
+            id: 2,
+            context: 'Nachrichtensendung',
+            audio: 'Die Europäische Zentralbank hat heute beschlossen, den Leitzins um einen Viertelprozentpunkt zu senken. Es ist die dritte Zinssenkung in diesem Jahr. Die Entscheidung soll die schwächelnde Wirtschaft im Euroraum ankurbeln. Analysten erwarten, dass Kredite für Unternehmen und Verbraucher dadurch günstiger werden. Kritiker warnen jedoch, dass die Maßnahme langfristig die Inflation ankurbeln könnte.',
+            question: 'Was soll die Zinssenkung bewirken?',
+            options: ['a) Die Inflation senken', 'b) Die Wirtschaft ankurbeln', 'c) Den Euro stärken'],
+            correct: 'b',
+          },
+          {
+            id: 3,
+            context: 'Telefonansage einer Behörde',
+            audio: 'Sie haben die Einwohnermeldebehörde des Landratsamts Dachau erreicht. Unsere Servicezeiten sind Montag bis Mittwoch und Freitag von acht bis zwölf Uhr sowie Donnerstag von vierzehn bis achtzehn Uhr. Für Terminvereinbarungen nutzen Sie bitte unser Online-Portal unter www.lra-dachau.de. Ohne Termin ist kein Einlass möglich. Für dringende Anliegen erreichen Sie uns telefonisch unter dieser Nummer Montag bis Freitag von acht bis siebzehn Uhr.',
+            question: 'Wann hat die Behörde Donnerstag geöffnet?',
+            options: ['a) Von 8 bis 12 Uhr', 'b) Von 14 bis 18 Uhr', 'c) Donnerstag ist geschlossen'],
+            correct: 'b',
+          },
+          {
+            id: 4,
+            context: 'Kurzmeldung',
+            audio: 'Der bekannte Berliner Sternekoch Thomas Gruber gibt seine zwei Michelin-Sterne zurück. In einem offenen Brief erklärt er, dass das Fine-Dining-Geschäft nicht mehr mit seiner Lebensphilosophie vereinbar sei. Gruber möchte künftig ein einfaches Restaurant mit ehrlicher, regionaler Küche führen, das für alle zugänglich ist. "Essen soll Freude machen, nicht einschüchtern", schreibt er.',
+            question: 'Warum gibt Gruber seine Sterne zurück?',
+            options: ['a) Er schließt sein Restaurant', 'b) Das Fine-Dining-Konzept passt nicht mehr zu seiner Philosophie', 'c) Er zieht ins Ausland'],
+            correct: 'b',
+          },
+          {
+            id: 5,
+            context: 'Wissenschaftsnachricht',
+            audio: 'Forscher der Universität Göttingen haben herausgefunden, dass Bäume miteinander kommunizieren — durch unterirdische Pilznetzwerke, die ihre Wurzeln verbinden. Über dieses Netzwerk können Bäume Nährstoffe und sogar Warnsignale bei Insektenbefall austauschen. Ältere, erfahrene Bäume unterstützen jüngere Bäume mit Nährstoffen. Die Forscher nennen dieses Netzwerk das "Wood Wide Web".',
+            question: 'Wie kommunizieren Bäume miteinander?',
+            options: ['a) Über chemische Duftstoffe in der Luft', 'b) Über unterirdische Pilznetzwerke', 'c) Über Vibrationen im Boden'],
+            correct: 'b',
+          },
+        ],
+      },
+      teil2: {
+        instruction: 'Sie hören ein längeres Gespräch. Richtig oder falsch?',
+        replays: 1,
+        items: [
+          {
+            id: 6,
+            context: 'Podcast: Zwei Menschen über Minimalismus',
+            audio: 'Host: Herzlich willkommen zum Podcast "Weniger ist mehr". Heute spreche ich mit Jana, die seit zwei Jahren minimalistisch lebt. Jana, wie kam das? Jana: Ich hatte einen Burnout. Als ich aus dem Krankenhaus kam, habe ich mir gefragt, was in meinem Leben wirklich wichtig ist. Ich hatte eine große Wohnung, ein teures Auto, viele Kleider — und trotzdem war ich unglücklich. Host: Was hast du dann gemacht? Jana: Ich habe angefangen, systematisch auszumisten. In drei Monaten habe ich siebzig Prozent meiner Sachen verschenkt oder verkauft. Host: Und wie ist es heute? Jana: Ich lebe in einer kleinen Wohnung, fahre Fahrrad, habe nur noch was ich wirklich brauche. Ich arbeite dreißig statt fünfzig Stunden pro Woche und verdiene weniger — aber ich bin viel glücklicher. Host: Vermisst du nichts? Jana: Die Fremdsprachenkurse, die ich früher machen wollte, aber nie Zeit hatte — die mache ich jetzt. Und ich koche wieder selbst, das liebe ich. Host: Was empfiehlst du Menschen, die anfangen möchten? Jana: Klein anfangen. Nicht alles auf einmal wegwerfen, sondern einen Schrank, eine Schublade. Und sich fragen: Macht mich das wirklich glücklich — oder kaufe ich es, um Lücken zu füllen?',
+            question: 'Jana hatte einen Burnout, bevor sie minimalistisch wurde.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 7,
+            question: 'Jana hat die meisten ihrer Sachen weggeworfen.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+          {
+            id: 8,
+            question: 'Jana arbeitet heute mehr Stunden als früher.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+          {
+            id: 9,
+            question: 'Jana macht jetzt Fremdsprachenkurse, für die sie früher keine Zeit hatte.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 10,
+            question: 'Jana empfiehlt, alles auf einmal zu verschenken.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+        ],
+      },
+      teil3: {
+        instruction: 'Sie hören ein Gespräch. Zu jedem Punkt eine Aufgabe.',
+        replays: 1,
+        items: [
+          {
+            id: 11,
+            context: 'Podiumsdiskussion über die Zukunft der Arbeit',
+            audio: 'Moderatorin: Wie wird sich die Arbeitswelt in den nächsten zehn Jahren verändern? Herr Dr. Wolf: Künstliche Intelligenz wird viele Routineaufgaben übernehmen — nicht nur in der Produktion, sondern auch in der Verwaltung, im Recht, in der Buchhaltung. Das klingt beängstigend, aber es hat auch eine positive Seite: Menschen können sich auf kreative und soziale Tätigkeiten konzentrieren. Frau Kremer: Ich sehe das optimistischer. Jede technologische Revolution hat letztendlich mehr Jobs geschaffen als vernichtet. Das Internet hat die Reisebüros dezimiert, aber IT-Jobs, Social-Media-Manager und App-Entwickler geschaffen. Moderatorin: Was müssen wir heute tun, um vorbereitet zu sein? Herr Dr. Wolf: Lebenslanges Lernen. Wer glaubt, mit einer Ausbildung für vierzig Jahre gerüstet zu sein, irrt sich. Frau Kremer: Und Unternehmen müssen in die Weiterbildung ihrer Mitarbeiter investieren — nicht nur in Technologie.',
+            question: 'Was wird KI laut Dr. Wolf übernehmen?',
+            options: ['a) Nur handwerkliche Tätigkeiten', 'b) Routineaufgaben in vielen Bereichen', 'c) Alle Berufe ohne Ausnahme'],
+            correct: 'b',
+          },
+          {
+            id: 12,
+            question: 'Wie bewertet Frau Kremer die Auswirkungen technologischer Revolutionen?',
+            options: ['a) Negativ — mehr Jobs werden vernichtet', 'b) Positiv — langfristig werden mehr Jobs geschaffen', 'c) Neutral — es gleicht sich immer aus'],
+            correct: 'b',
+          },
+          {
+            id: 13,
+            question: 'Was hat laut Frau Kremer das Internet dezimiert?',
+            options: ['a) Buchhaltungsbüros', 'b) Reisebüros', 'c) Zeitungsredaktionen'],
+            correct: 'b',
+          },
+          {
+            id: 14,
+            question: 'Was hält Dr. Wolf für entscheidend in der Zukunft?',
+            options: ['a) Eine sehr gute Erstausbildung', 'b) Lebenslanges Lernen', 'c) Früh in Rente gehen'],
+            correct: 'b',
+          },
+          {
+            id: 15,
+            question: 'Worin soll laut Frau Kremer investiert werden?',
+            options: ['a) Nur in neue Technologien', 'b) In die Weiterbildung der Mitarbeiter und in Technologie', 'c) In günstigere Produktion'],
+            correct: 'b',
+          },
+        ],
+      },
+    },
+    lesen: {
+      teil1: {
+        instruction: 'Lesen Sie die Texte. Welche Antwort passt?',
+        items: [
+          {
+            id: 1,
+            text: 'OFFENER BRIEF an den Bürgermeister\nSehr geehrter Herr Bürgermeister, als Anwohnerin der Hauptstraße möchte ich auf ein zunehmendes Problem hinweisen: Die Lärm- und Luftbelastung durch den täglichen Schwerlastverkehr hat ein nicht mehr erträgliches Ausmaß erreicht. Ich fordere die Einführung einer LKW-Durchfahrtsverbots zwischen 22 und 6 Uhr sowie die Prüfung einer Umgehungsstraße. Mehrere hundert Anwohner haben diese Petition bereits unterzeichnet.',
+            question: 'Was fordert die Verfasserin?',
+            options: ['a) Mehr Parkplätze für LKW', 'b) Ein nächtliches LKW-Durchfahrtsverbot und eine Umgehungsstraße', 'c) Bessere Straßenbeleuchtung'],
+            correct: 'b',
+          },
+          {
+            id: 2,
+            text: 'FÖRDERPROGRAMM: "Gründen in Bayern"\nDas Bayerische Wirtschaftsministerium fördert innovative Unternehmensgründungen mit zinslosen Darlehen bis zu 250.000 Euro. Voraussetzung: Das Unternehmen muss in Bayern gegründet werden und mindestens drei dauerhafte Arbeitsplätze schaffen. Bewerbungsschluss: 28. Februar. Online-Bewerbung: www.gruenden-in-bay.de',
+            question: 'Welche Voraussetzung gilt für das Förderprogramm?',
+            options: ['a) Unternehmen muss exportieren', 'b) Gründung in Bayern mit mindestens drei dauerhaften Jobs', 'c) Mindestrkapital von 50.000 Euro'],
+            correct: 'b',
+          },
+          {
+            id: 3,
+            text: 'KULTURNOTIZ: Die Ausstellung "Grenzen.Überwinden" im Berliner Kulturforum zeigt Werke von Künstlerinnen und Künstlern aus zwölf Ländern, die sich mit Migration, Identität und Zugehörigkeit auseinandersetzen. Die Ausstellung ist das Ergebnis eines zweijährigen Residenzprogramms. Zur Vernissage am 15. März wird die Botschafterin von Portugal erwartet. Öffnungszeiten: Dienstag bis Sonntag, 10–20 Uhr.',
+            question: 'Womit beschäftigt sich die Ausstellung?',
+            options: ['a) Mit der Geschichte Berlins', 'b) Mit Migration, Identität und Zugehörigkeit', 'c) Mit modernen Technologien in der Kunst'],
+            correct: 'b',
+          },
+          {
+            id: 4,
+            text: 'REISEWARNUNG: Das Auswärtige Amt warnt vor Reisen in die Provinz Nordost des betreffenden Landes aufgrund anhaltender Sicherheitsprobleme. Deutsche Staatsangehörige, die sich dort aufhalten, werden aufgefordert, die Region zu verlassen. Für andere Teile des Landes gilt eine erhöhte Wachsamkeit. Registrieren Sie sich bitte im Krisenvorsorgeregister unter elefand.auswaertiges-amt.de',
+            question: 'Was empfiehlt das Auswärtige Amt deutschen Staatsangehörigen in der Provinz Nordost?',
+            options: ['a) Sich bei der Botschaft zu melden', 'b) Die Region zu verlassen', 'c) Zu Hause zu bleiben'],
+            correct: 'b',
+          },
+          {
+            id: 5,
+            text: 'PRESSEBERICHT: Der diesjährige Integrationspreis der Stadt Frankfurt geht an den Verein "Brücken bauen e.V.", der seit zehn Jahren Sprachkurse und Mentoring-Programme für Neuzugewanderte anbietet. Über dreitausend Menschen haben die Programme bisher genutzt, von denen mehr als sechzig Prozent eine Beschäftigung oder einen Ausbildungsplatz gefunden haben.',
+            question: 'Was macht der ausgezeichnete Verein?',
+            options: ['a) Er vermittelt Wohnungen an Geflüchtete', 'b) Er bietet Sprachkurse und Mentoring für Neuzugewanderte', 'c) Er organisiert kulturelle Veranstaltungen'],
+            correct: 'b',
+          },
+        ],
+      },
+      teil2: {
+        instruction: 'Lesen Sie den Text. Richtig oder falsch?',
+        items: [
+          {
+            id: 6,
+            text: 'REPORT: Bildungsgerechtigkeit in Deutschland\nDeutschland gilt in internationalen Vergleichsstudien als eines der Länder mit der stärksten Abhängigkeit zwischen sozialem Hintergrund und Bildungserfolg. Kinder aus einkommensschwachen Familien oder mit Migrationshintergrund haben signifikant schlechtere Chancen, das Gymnasium zu besuchen und zu studieren — obwohl die kognitive Eignung vergleichbar ist.\nEin zentrales Problem ist der frühe Zeitpunkt der Schulempfehlung: In den meisten Bundesländern wird nach der vierten Klasse entschieden, welche weiterführende Schule ein Kind besucht. In diesem Alter sind Kinder stark von ihrem häuslichen Umfeld beeinflusst. Kinder aus bildungsnahen Haushalten werden auch bei gleicher Leistung häufiger fürs Gymnasium empfohlen.\nForscher fordern ein längeres gemeinsames Lernen, wie es in anderen europäischen Ländern praktiziert wird, sowie gezielte Frühförderung ab der Kita. Lehrkräfte sollen stärker für unbewusste Vorurteile sensibilisiert werden. Zudem müsste die Betreuung nach der Schule ausgebaut werden, damit auch Kinder berufstätiger Eltern Hausaufgabenhilfe erhalten.',
+            question: 'In Deutschland hängt der Bildungserfolg stark vom sozialen Hintergrund ab.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 7,
+            question: 'In Deutschland wird die Schulempfehlung nach der sechsten Klasse gegeben.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+          {
+            id: 8,
+            question: 'Kinder aus bildungsnahen Familien bekommen häufiger eine Gymnasialempfehlung, auch bei gleicher Leistung.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+          {
+            id: 9,
+            question: 'Forscher empfehlen, Kinder früher zu trennen.',
+            options: ['richtig', 'falsch'],
+            correct: 'falsch',
+          },
+          {
+            id: 10,
+            question: 'Eine bessere Nachmittagsbetreuung würde laut dem Text mehr Kindern helfen.',
+            options: ['richtig', 'falsch'],
+            correct: 'richtig',
+          },
+        ],
+      },
+      teil3: {
+        instruction: 'Lesen Sie den Text. Welche Antwort passt?',
+        items: [
+          {
+            id: 11,
+            text: 'DER WERT DER STILLE\nIn einer Welt, die immer lauter wird, wird Stille zu einem Luxusgut. Smartphones vibrieren, Benachrichtigungen klingeln, Open-Space-Büros summen — kaum jemand kann sich dem Lärm der modernen Welt entziehen. Dabei ist Stille nicht nur angenehm, sondern lebenswichtig: Wissenschaftliche Studien zeigen, dass Menschen, die regelmäßig Stille erleben, kreative und kritische Denkleistungen deutlich steigern können.\nDie Sehnsucht nach Stille zeigt sich in einem wachsenden Markt: Retreats in stillen Klöstern, "Digital Detox"-Reisen und Meditationsapps boomen. Doch Stille muss man sich heutzutage leisten können — sowohl zeitlich als auch finanziell. Wer in einer kleinen Wohnung mit Familie lebt und zwei Jobs hat, kann sich Stille kaum erlauben.\nDaher argumentieren einige Sozialwissenschaftler, dass Stille eine Frage sozialer Gerechtigkeit ist. Lärm, so zeigen Studien, konzentriert sich in einkommensschwächeren Stadtvierteln — mehr Verkehr, mehr Industrie, weniger Grünflächen. Wer sich keine ruhige Wohngegend leisten kann, leidet nicht nur körperlich durch Lärm, sondern verliert auch die kognitiven Vorteile der Stille.',
+            question: 'Was belegen wissenschaftliche Studien über Stille?',
+            options: ['a) Sie hilft beim Schlafen', 'b) Sie steigert kreative und kritische Denkleistungen', 'c) Sie verbessert die körperliche Gesundheit'],
+            correct: 'b',
+          },
+          {
+            id: 12,
+            text: '',
+            question: 'Was zeigt der Markt für Stille-Produkte?',
+            options: ['a) Das Interesse daran nimmt ab', 'b) Retreats und Digital-Detox-Angebote wachsen', 'c) Nur Ältere interessieren sich dafür'],
+            correct: 'b',
+          },
+          {
+            id: 13,
+            text: '',
+            question: 'Wer hat laut dem Text Schwierigkeiten, Stille zu erleben?',
+            options: ['a) Jugendliche', 'b) Menschen mit wenig Zeit und Geld', 'c) Stadtbewohner im Allgemeinen'],
+            correct: 'b',
+          },
+          {
+            id: 14,
+            text: '',
+            question: 'Wo konzentriert sich laut Studien der Lärm?',
+            options: ['a) In Gewerbegebieten', 'b) In einkommensschwächeren Stadtvierteln', 'c) In Schulen und Kindergärten'],
+            correct: 'b',
+          },
+          {
+            id: 15,
+            text: '',
+            question: 'Als was bezeichnen Sozialwissenschaftler Stille?',
+            options: ['a) Als medizinisches Problem', 'b) Als Frage sozialer Gerechtigkeit', 'c) Als persönliche Entscheidung'],
+            correct: 'b',
+          },
+        ],
+      },
+    },
+    schreiben: {
+      teil1: {
+        instruction: 'Lesen Sie die Situation. Schreiben Sie eine formelle E-Mail.',
+        formTitle: 'Bewerbungsschreiben — Auslandspraktikum',
+        personCard: [
+          'Bewerber: Lena Braun, Studentin der BWL im 4. Semester, Universität Stuttgart',
+          'Zielunternehmen: Schmidt & Partner GmbH, Abteilung Marketing, Wien',
+          'Zeitraum: 3 Monate ab 1. März',
+          'Qualifikationen: Gutes Englisch und Spanisch, Kenntnisse in Social Media Marketing, Bachelorarbeit zum Thema digitales Marketing',
+          'Motivation: Internationale Erfahrung sammeln, Wien kennenlernen',
+        ],
+        fields: [
+          { label: 'Betreff', answer: 'Bewerbung um ein Marketingpraktikum ab 1. März' },
+          { label: 'Hauptmotivation', answer: 'Ich möchte internationale Berufserfahrung sammeln und meine Kenntnisse im digitalen Marketing in der Praxis anwenden.' },
+          { label: 'Wichtigste Qualifikation', answer: 'Ich verfüge über gute Kenntnisse in Social Media Marketing und schreibe meine Bachelorarbeit zu diesem Thema.' },
+          { label: 'Praktikumsdauer und Starttermin', answer: 'Drei Monate ab dem 1. März' },
+          { label: 'Abschluss', answer: 'Über eine Einladung zu einem Gespräch würde ich mich sehr freuen.' },
+        ],
+      },
+      teil2: {
+        instruction: 'Schreiben Sie einen argumentativen Text.',
+        situation: 'Thema: "Sollte der öffentliche Nahverkehr in Städten kostenlos sein?" Viele Städte diskutieren dieses Thema.',
+        bullets: [
+          'Stellen Sie das Thema kurz vor',
+          'Nennen Sie drei Argumente für kostenlosen ÖPNV',
+          'Diskutieren Sie zwei mögliche Probleme oder Gegenargumente',
+          'Vertreten Sie Ihren eigenen Standpunkt klar und begründet',
+        ],
+        minWords: 100,
+      },
+    },
+    sprechen: {
+      teil1: {
+        teil: 1,
+        instruction: 'Halten Sie einen kurzen Vortrag über ein Thema, das Sie interessiert.',
+        prompts: [
+          'Wählen Sie ein Thema (z.B. eine Technologie, ein soziales Problem, ein Hobby)',
+          'Erklären Sie, warum das Thema wichtig oder interessant ist',
+          'Beschreiben Sie ein konkretes Beispiel oder eine persönliche Erfahrung',
+          'Schließen Sie mit Ihrer persönlichen Einschätzung ab',
+        ],
+        exampleResponse: 'Heute möchte ich über... sprechen. Dieses Thema ist wichtig, weil... Ein konkretes Beispiel dafür ist... Ich denke, dass...',
+      },
+      teil2: {
+        teil: 2,
+        instruction: 'Simulieren Sie ein schwieriges Gespräch.',
+        prompts: [
+          'Sie müssen Ihrem Chef erklären, dass Sie einen Fehler gemacht haben',
+          'Erklären Sie, was passiert ist',
+          'Übernehmen Sie Verantwortung',
+          'Machen Sie einen konkreten Lösungsvorschlag',
+          'Bitten Sie um eine zweite Chance',
+        ],
+      },
+      teil3: {
+        teil: 3,
+        instruction: 'Führen Sie ein Expertengespräch.',
+        prompts: [
+          'Sie sind "Experte" für Ihr Herkunftsland oder Ihre Region',
+          'Beschreiben Sie, was Ihr Land besonders macht',
+          'Was können Deutsche von Ihrer Kultur lernen?',
+          'Was haben Sie in Deutschland gelernt oder schätzen gelernt?',
+        ],
+      },
+    },
+  },
+];

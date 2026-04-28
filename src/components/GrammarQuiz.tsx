@@ -2,16 +2,17 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { ArrowLeft, Zap } from 'lucide-react';
 import { AnswerFeedback } from './AnswerFeedback';
 import {
-  fillInQuestions,
   CATEGORY_LABELS,
   CATEGORY_COLORS,
+  getFillInForLevel,
   type GrammarCategory,
 } from '../grammar-games-data';
 import { recordMistake } from '../mistakeTracking';
-import { loadActiveLevel } from '../levelConfig';
+import { type ExamLevel, loadActiveLevel } from '../levelConfig';
 
 interface GrammarQuizProps {
   onBack: () => void;
+  level?: ExamLevel;
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -30,10 +31,15 @@ const ALL_CATEGORIES: GrammarCategory[] = [
 
 // ── Category Picker ───────────────────────────────────────────────
 
-function CategoryPicker({ onSelect, onBack }: { onSelect: (cat: GrammarCategory | 'all') => void; onBack: () => void }) {
+function CategoryPicker({ onSelect, onBack, questions, level }: {
+  onSelect: (cat: GrammarCategory | 'all') => void;
+  onBack: () => void;
+  questions: ReturnType<typeof getFillInForLevel>;
+  level: string;
+}) {
   const counts: Record<string, number> = {};
   for (const cat of ALL_CATEGORIES) {
-    counts[cat] = fillInQuestions.filter(q => q.category === cat).length;
+    counts[cat] = questions.filter(q => q.category === cat).length;
   }
 
   return (
@@ -53,10 +59,10 @@ function CategoryPicker({ onSelect, onBack }: { onSelect: (cat: GrammarCategory 
             className="card card-interactive !rounded-2xl p-5 text-left col-span-full"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-telc text-white flex items-center justify-center shrink-0 font-extrabold text-lg">A1</div>
+              <div className="w-12 h-12 rounded-xl bg-telc text-white flex items-center justify-center shrink-0 font-extrabold text-lg">{level}</div>
               <div>
                 <div className="font-extrabold text-telc">Alle Kategorien (gemischt)</div>
-                <div className="text-sm text-gray-500">{fillInQuestions.length} Fragen · {QUESTIONS_PER_SESSION} pro Runde · zufällig gemischt</div>
+                <div className="text-sm text-gray-500">{questions.length} Fragen · {QUESTIONS_PER_SESSION} pro Runde · zufällig gemischt</div>
               </div>
             </div>
           </button>
@@ -99,7 +105,8 @@ function categoryDesc(cat: GrammarCategory): string {
 
 // ── Main Component ────────────────────────────────────────────────
 
-export function GrammarQuiz({ onBack }: GrammarQuizProps) {
+export function GrammarQuiz({ onBack, level = 'A1' }: GrammarQuizProps) {
+  const fillInQuestions = getFillInForLevel(level);
   const [category, setCategory] = useState<GrammarCategory | 'all' | null>(null);
   const [questionIdx, setQuestionIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -195,7 +202,7 @@ export function GrammarQuiz({ onBack }: GrammarQuizProps) {
 
   // ── Category picker ──────────────────────────────────────────
   if (!category) {
-    return <CategoryPicker onSelect={setCategory} onBack={onBack} />;
+    return <CategoryPicker onSelect={setCategory} onBack={onBack} questions={fillInQuestions} level={level} />;
   }
 
   // ── Finished ─────────────────────────────────────────────────
@@ -337,7 +344,7 @@ export function GrammarQuiz({ onBack }: GrammarQuizProps) {
             }
             return (
               <button
-                key={opt}
+                key={`${questionIdx}-${i}`}
                 onClick={() => handleSelect(opt)}
                 disabled={showFeedback}
                 className={`option-card w-full ${extraClass}`}

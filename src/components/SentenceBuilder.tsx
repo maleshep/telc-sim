@@ -1,9 +1,11 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { ArrowLeft, CheckCircle, RotateCcw, ChevronRight } from 'lucide-react';
-import { sentenceExercises } from '../grammar-games-data';
+import { getSentenceExercisesForLevel } from '../grammar-games-data';
+import type { ExamLevel } from '../levelConfig';
 
 interface SentenceBuilderProps {
   onBack: () => void;
+  level?: ExamLevel;
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -19,7 +21,8 @@ const EXERCISES_PER_SESSION = 10;
 
 type Phase = 'building' | 'correct' | 'wrong';
 
-export function SentenceBuilder({ onBack }: SentenceBuilderProps) {
+export function SentenceBuilder({ onBack, level = 'A1' }: SentenceBuilderProps) {
+  const sentenceExercises = getSentenceExercisesForLevel(level);
   const [exerciseIdx, setExerciseIdx] = useState(0);
   const [phase, setPhase] = useState<Phase>('building');
   const [built, setBuilt] = useState<string[]>([]);   // words placed so far

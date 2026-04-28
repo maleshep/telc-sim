@@ -1,14 +1,16 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import type { VocabTopic } from '../study-data';
-import { studyData } from '../study-data';
+import { getStudyDataForLevel } from '../study-data';
 import {
   ArrowLeft, RotateCcw, ChevronLeft, ChevronRight,
   CheckCircle, Shuffle, Eye,
 } from 'lucide-react';
 import { markKnown as persistMarkKnown } from '../vocabTracking';
+import type { ExamLevel } from '../levelConfig';
 
 interface FlashcardsProps {
   onBack: () => void;
+  level?: ExamLevel;
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -20,14 +22,15 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-export function Flashcards({ onBack }: FlashcardsProps) {
+export function Flashcards({ onBack, level = 'A1' }: FlashcardsProps) {
+  const { vocabulary: vocabList } = getStudyDataForLevel(level);
   const [topicId, setTopicId] = useState<string | null>(null);
   const [cardIdx, setCardIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [known, setKnown] = useState<Set<number>>(new Set());
   const [shuffled, setShuffled] = useState(false);
 
-  const topic = topicId ? studyData.vocabulary.find(t => t.id === topicId) : null;
+  const topic = topicId ? vocabList.find(t => t.id === topicId) : null;
   const words = useMemo(() => {
     if (!topic) return [];
     return shuffled ? shuffle(topic.words) : topic.words;
@@ -87,7 +90,7 @@ export function Flashcards({ onBack }: FlashcardsProps) {
   if (!topicId) {
     return (
       <TopicPicker
-        topics={studyData.vocabulary}
+        topics={vocabList}
         onSelect={setTopicId}
         onBack={onBack}
         title="Karteikarten"

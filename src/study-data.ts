@@ -1,5 +1,6 @@
-// TELC A1 Study Materials — Vocabulary & Grammar Reference
-// Comprehensive A1-level German study data for exam preparation
+// TELC Study Materials — Vocabulary & Grammar Reference (multi-level)
+
+import type { ExamLevel } from './levelConfig';
 
 export interface VocabWord {
   german: string;
@@ -14,6 +15,7 @@ export interface VocabTopic {
   name: string;        // German topic name
   nameEn: string;      // English topic name
   icon: string;        // lucide icon name
+  level?: ExamLevel;   // undefined = A1 (backward compat)
   words: VocabWord[];
 }
 
@@ -23,6 +25,7 @@ export interface GrammarRule {
   titleEn: string;
   explanation: string;  // in simple German
   explanationEn: string;
+  level?: ExamLevel;    // undefined = A1
   tables?: { headers: string[]; rows: string[][] }[];
   examples: { german: string; english: string }[];
   tip?: string;  // learning tip
@@ -1051,9 +1054,22 @@ const grammar: GrammarRule[] = [
 //  EXPORT
 // ---------------------------------------------------------------------------
 
+import { vocabularyA2, grammarA2 } from './study-data-a2';
+import { vocabularyB1, grammarB1 } from './study-data-b1';
+
+// A1 base data (backward compat — no level field = A1)
 export const studyData: StudyData = {
   vocabulary,
   grammar,
 };
+
+/** Get study data filtered by level */
+export function getStudyDataForLevel(level: ExamLevel): StudyData {
+  if (level === 'A2') return { vocabulary: vocabularyA2, grammar: grammarA2 };
+  if (level === 'B1') return { vocabulary: vocabularyB1, grammar: grammarB1 };
+  // A1 default (A1 data has no level field; B2 falls back to B1 content for now)
+  if (level === 'B2') return { vocabulary: vocabularyB1, grammar: grammarB1 };
+  return studyData;
+}
 
 export default studyData;

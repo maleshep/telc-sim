@@ -1,12 +1,14 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { studyData } from '../study-data';
+import { getStudyDataForLevel } from '../study-data';
 import { ArrowLeft, Zap } from 'lucide-react';
 import { TopicPicker } from './Flashcards';
 import { AnswerFeedback } from './AnswerFeedback';
 import { markKnown, trackLookedUp } from '../vocabTracking';
+import type { ExamLevel } from '../levelConfig';
 
 interface VocabQuizProps {
   onBack: () => void;
+  level?: ExamLevel;
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -25,12 +27,14 @@ interface QuizQuestion {
   options: string[];
 }
 
-function generateQuestions(topicId: string): QuizQuestion[] {
-  const topic = studyData.vocabulary.find(t => t.id === topicId);
+import type { VocabTopic } from '../study-data';
+
+function generateQuestions(topicId: string, vocabulary: VocabTopic[]): QuizQuestion[] {
+  const topic = vocabulary.find(t => t.id === topicId);
   if (!topic) return [];
 
   // Get all english words for wrong answers
-  const allEnglish = studyData.vocabulary.flatMap(t => t.words.map(w => w.english));
+  const allEnglish = vocabulary.flatMap(t => t.words.map(w => w.english));
 
   return shuffle(topic.words).map(word => {
     // Pick 3 wrong answers from other words
@@ -49,7 +53,8 @@ function generateQuestions(topicId: string): QuizQuestion[] {
   });
 }
 
-export function VocabQuiz({ onBack }: VocabQuizProps) {
+export function VocabQuiz({ onBack, level = 'A1' }: VocabQuizProps) {
+  const { vocabulary: vocabList } = getStudyDataForLevel(level);
   const [topicId, setTopicId] = useState<string | null>(null);
   const [questionIdx, setQuestionIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -61,10 +66,10 @@ export function VocabQuiz({ onBack }: VocabQuizProps) {
 
   const questions = useMemo(() => {
     if (!topicId) return [];
-    return generateQuestions(topicId);
+    return generateQuestions(topicId, vocabList);
   }, [topicId]);
 
-  const topic = topicId ? studyData.vocabulary.find(t => t.id === topicId) : null;
+  const topic = topicId ? vocabList.find(t => t.id === topicId) : null;
   const question = questions[questionIdx];
   const total = questions.length;
 
@@ -129,7 +134,7 @@ export function VocabQuiz({ onBack }: VocabQuizProps) {
   if (!topicId) {
     return (
       <TopicPicker
-        topics={studyData.vocabulary}
+        topics={vocabList}
         onSelect={setTopicId}
         onBack={onBack}
         title="Vokabel-Quiz"
@@ -233,7 +238,7 @@ export function VocabQuiz({ onBack }: VocabQuizProps) {
 
             return (
               <button
-                key={opt}
+                key={`${questionIdx}-${i}`}
                 onClick={() => handleSelect(opt)}
                 disabled={showFeedback}
                 className={`option-card w-full ${extraClass}`}

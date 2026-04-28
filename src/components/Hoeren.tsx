@@ -89,15 +89,17 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
 
   async function playItem(): Promise<void> {
     // Prefer pre-recorded file; fall back to TTS
+    const audioText = item.audio ?? '';
     if (item.audioFile) {
       return new Promise((resolve, reject) => {
         const audio = new Audio(item.audioFile!);
         audio.onended = () => resolve();
-        audio.onerror = () => speak(item.audio).then(resolve).catch(reject);
-        audio.play().catch(() => speak(item.audio).then(resolve).catch(reject));
+        audio.onerror = () => (audioText ? speak(audioText) : Promise.resolve()).then(resolve).catch(reject);
+        audio.play().catch(() => (audioText ? speak(audioText) : Promise.resolve()).then(resolve).catch(reject));
       });
     }
-    return speak(item.audio);
+    if (!audioText) return; // continuation item — no audio to play
+    return speak(audioText);
   }
 
   async function playAudio() {
@@ -285,7 +287,7 @@ export function Hoeren({ data, teile, practice, onComplete }: HoerenProps) {
               const isSelected = selected === val;
               return (
                 <label
-                  key={opt}
+                  key={`${teilIdx}-${itemIdx}-${i}`}
                   onClick={() => phase !== 'feedback' && pick(val)}
                   className={`option-card ${isSelected ? 'selected-blue' : ''}`}
                 >

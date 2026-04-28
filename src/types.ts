@@ -2,7 +2,7 @@
 
 export interface HoerenItem {
   id: number;
-  audio: string;        // Text for TTS to read aloud (the "audio" script)
+  audio?: string;       // Text for TTS to read aloud (the "audio" script)
   audioFile?: string;   // Pre-recorded compressed audio, e.g. "/audio/t1-h1-item1.mp3"
   context?: string;     // Scene context shown before audio plays
   question: string;
@@ -18,7 +18,7 @@ export interface HoerenTeil {
 
 export interface LesenItem {
   id: number;
-  text: string;         // The reading text
+  text?: string;        // The reading text (empty for continuation items)
   question: string;
   options: string[];
   correct: string;

@@ -1,6 +1,8 @@
 // TELC A1 Grammar Games Data
 // Fill-in questions + Sentence Builder exercises
 
+import type { ExamLevel } from './levelConfig';
+
 export type GrammarCategory =
   | 'conjugation'
   | 'modal'
@@ -37,6 +39,7 @@ export interface FillInQuestion {
   category: GrammarCategory;
   explanation: string;       // German grammar rule
   explanationEn: string;     // English translation in italics
+  level?: ExamLevel;         // undefined = A1
 }
 
 export interface SentenceExercise {
@@ -44,6 +47,7 @@ export interface SentenceExercise {
   focus: string;             // short grammar label shown on card
   tip: string;               // explanation shown after wrong answer (German)
   tipEn: string;             // English translation
+  level?: ExamLevel;         // undefined = A1
 }
 
 // ── Fill-in Questions ─────────────────────────────────────────────
@@ -116,7 +120,7 @@ export const fillInQuestions: FillInQuestion[] = [
   },
   {
     sentence: 'Wie ___ du? (heißen)',
-    options: ['heißt', 'heiße', 'heißen', 'heißt'],
+    options: ['heißt', 'heiße', 'heißen', 'geheißen'],
     correct: 'heißt',
     category: 'conjugation',
     explanation: 'heißen: du → heißt',
@@ -779,3 +783,20 @@ export const sentenceExercises: SentenceExercise[] = [
     tipEn: 'Basic order: Subject – Verb – Adverb – Object.',
   },
 ];
+
+// ── Level-aware exports ───────────────────────────────────────────
+
+import { fillInQuestionsA2, sentenceExercisesA2 } from './grammar-games-data-a2';
+import { fillInQuestionsB1, sentenceExercisesB1 } from './grammar-games-data-b1';
+
+export function getFillInForLevel(level: ExamLevel): FillInQuestion[] {
+  if (level === 'A2') return fillInQuestionsA2;
+  if (level === 'B1' || level === 'B2') return fillInQuestionsB1;
+  return fillInQuestions; // A1
+}
+
+export function getSentenceExercisesForLevel(level: ExamLevel): SentenceExercise[] {
+  if (level === 'A2') return sentenceExercisesA2;
+  if (level === 'B1' || level === 'B2') return sentenceExercisesB1;
+  return sentenceExercises; // A1
+}

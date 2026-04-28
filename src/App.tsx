@@ -349,7 +349,7 @@ function App() {
   }
 
   if (screen === 'study') {
-    return <Study onBack={goHome} />;
+    return <Study level={level} onBack={goHome} />;
   }
 
   if (screen === 'history') {

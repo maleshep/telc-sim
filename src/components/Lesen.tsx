@@ -229,7 +229,7 @@ export function Lesen({ data, teile, practice, onComplete }: LesenProps) {
               const isSelected = selected === val;
               return (
                 <label
-                  key={opt}
+                  key={`${teilIdx}-${itemIdx}-${i}`}
                   onClick={() => phase !== 'feedback' && pick(val)}
                   className={`option-card ${isSelected ? 'selected-amber' : ''}`}
                 >

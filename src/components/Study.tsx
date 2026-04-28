@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { VocabTopic, GrammarRule } from '../study-data';
-import { studyData } from '../study-data';
+import { getStudyDataForLevel } from '../study-data';
+import type { ExamLevel } from '../levelConfig';
 import {
   BookOpen, Languages, ChevronRight, ChevronDown,
   ArrowLeft, Search, Gamepad2, CreditCard, HelpCircle, Star, BrainCircuit, Puzzle,
@@ -14,23 +15,24 @@ import { SentenceBuilder } from './SentenceBuilder';
 type Tab = 'games' | 'vocabulary' | 'grammar';
 type ActiveGame = 'flashcards' | 'quiz' | 'grammar-quiz' | 'sentence-builder' | null;
 
-export function Study({ onBack }: { onBack: () => void }) {
+export function Study({ onBack, level = 'A1' }: { onBack: () => void; level?: ExamLevel }) {
   const [tab, setTab] = useState<Tab>('games');
   const [search, setSearch] = useState('');
   const [activeGame, setActiveGame] = useState<ActiveGame>(null);
+  const studyData = getStudyDataForLevel(level);
 
   // ── Active game screens ─────────────────────────────────────────
   if (activeGame === 'grammar-quiz') {
-    return <GrammarQuiz onBack={() => setActiveGame(null)} />;
+    return <GrammarQuiz level={level} onBack={() => setActiveGame(null)} />;
   }
   if (activeGame === 'sentence-builder') {
-    return <SentenceBuilder onBack={() => setActiveGame(null)} />;
+    return <SentenceBuilder level={level} onBack={() => setActiveGame(null)} />;
   }
   if (activeGame === 'flashcards') {
-    return <Flashcards onBack={() => setActiveGame(null)} />;
+    return <Flashcards level={level} onBack={() => setActiveGame(null)} />;
   }
   if (activeGame === 'quiz') {
-    return <VocabQuiz onBack={() => setActiveGame(null)} />;
+    return <VocabQuiz level={level} onBack={() => setActiveGame(null)} />;
   }
 
   return (
@@ -101,8 +103,8 @@ export function Study({ onBack }: { onBack: () => void }) {
             />
           </div>
         )}
-        {tab === 'vocabulary' && <div key="vocab" className="tab-fade"><VocabularyView search={search} /></div>}
-        {tab === 'grammar' && <div key="grammar" className="tab-fade"><GrammarView search={search} /></div>}
+        {tab === 'vocabulary' && <div key="vocab" className="tab-fade"><VocabularyView search={search} vocabulary={studyData.vocabulary} /></div>}
+        {tab === 'grammar' && <div key="grammar" className="tab-fade"><GrammarView search={search} grammar={studyData.grammar} /></div>}
       </main>
     </div>
   );
@@ -230,11 +232,11 @@ function GamesView({ onFlashcards, onQuiz, onGrammarQuiz, onSentenceBuilder }: {
 
 // ── Vocabulary ────────────────────────────────────────────────────
 
-function VocabularyView({ search }: { search: string }) {
+function VocabularyView({ search, vocabulary }: { search: string; vocabulary: VocabTopic[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const q = search.toLowerCase();
 
-  const topics = studyData.vocabulary.filter((t) => {
+  const topics = vocabulary.filter((t) => {
     if (!q) return true;
     return (
       t.name.toLowerCase().includes(q) ||
@@ -338,11 +340,11 @@ function getTopicEmoji(id: string): string {
 
 // ── Grammar ──────────────────────────────────────────────────────
 
-function GrammarView({ search }: { search: string }) {
+function GrammarView({ search, grammar }: { search: string; grammar: GrammarRule[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const q = search.toLowerCase();
 
-  const rules = studyData.grammar.filter((r) => {
+  const rules = grammar.filter((r) => {
     if (!q) return true;
     return (
       r.title.toLowerCase().includes(q) ||
