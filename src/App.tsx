@@ -412,6 +412,15 @@ function App() {
       {/* Navigation bar */}
       <div className="bg-white border-b-2 border-card-border px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
+          {/* Logo — home shortcut */}
+          <button
+            onClick={() => setAbandonConfirm(true)}
+            className="shrink-0"
+            title="Zur Startseite"
+          >
+            <img src="/logo.png" alt="telc sim" className="w-8 h-8 rounded-lg" />
+          </button>
+          <span className="text-gray-200">|</span>
           <button
             onClick={() => setAbandonConfirm(true)}
             className="text-sm font-bold text-gray-400 hover:text-telc transition-colors"

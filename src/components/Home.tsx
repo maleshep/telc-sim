@@ -81,6 +81,9 @@ export function Home({ tests, level, onLevelChange, onStartExam, onPractice, onS
           <div className="absolute bottom-2 right-12 w-32 h-32 rounded-full bg-white/15 blur-2xl" />
         </div>
         <div className="relative">
+          <div className="flex justify-center mb-3">
+            <img src="/logo.png" alt="telc sim" className="w-16 h-16 rounded-2xl shadow-lg" />
+          </div>
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-sm font-semibold px-4 py-1.5 rounded-full mb-3">
             <Sparkles size={14} />
             Prüfungssimulator
