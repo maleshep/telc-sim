@@ -74,32 +74,35 @@ export function Home({ tests, level, onLevelChange, onStartExam, onPractice, onS
 
   return (
     <div className="min-h-dvh flex flex-col bg-exam-bg">
-      {/* Compact top bar — logo bleeds into gradient */}
-      <header className="bg-gradient-to-br from-telc via-telc-dark to-telc-darker text-white px-4 pt-safe relative overflow-hidden">
+      {/* Compact top bar — stone bleeds into gradient */}
+      <header className="bg-gradient-to-br from-telc via-telc-dark to-telc-darker text-white relative" style={{ paddingBottom: '12px' }}>
         {/* Subtle ambient glow */}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
           <div className="absolute top-0 right-8 w-32 h-32 rounded-full bg-white/20 blur-2xl" />
         </div>
 
         {/* Main nav row */}
-        <div className="relative flex items-center gap-3 py-2">
-          {/* Logo — large, top-left, bleeds into the green background seamlessly */}
+        <div className="relative flex items-end gap-4 px-4 pt-3 pb-0">
+          {/* Stone — transparent bg, large, sits in corner bleeding into header */}
           <img
             src="/logo.png"
             alt="TELC Sim"
-            className="w-16 h-16 rounded-2xl"
             style={{
-              filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
-              marginLeft: '-4px',
+              width: '72px',
+              height: '72px',
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.45))',
+              marginBottom: '-12px', // bleeds below the header into content
+              flexShrink: 0,
             }}
           />
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 pb-3">
             <div className="font-extrabold text-xl leading-tight tracking-tight">TELC Sim</div>
             <div className="text-white/60 text-[11px] font-semibold tracking-wider uppercase leading-none mt-0.5">
               {cfg.name} · {cfg.subtitle}
             </div>
           </div>
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0 pb-3">
             <Sparkles size={12} className="text-white/50" />
             <span className="text-xs font-bold text-white/70">Prüfungssimulator</span>
           </div>
