@@ -3,7 +3,7 @@ import type { TelcTest, Section } from '../types';
 import {
   Headphones, BookOpen, PenTool, MessageSquare,
   ChevronRight, Play, BookMarked, GraduationCap, Languages,
-  Sparkles, Award, AlertCircle, TrendingUp, CheckCircle2, Lock,
+  Sparkles, Award, AlertCircle, CheckCircle2, Lock,
 } from 'lucide-react';
 import { isTTSAvailable, isSTTAvailable, isUsingFallbackTTS } from '../speech';
 import { isLLMConfigured } from '../llm';
@@ -74,79 +74,78 @@ export function Home({ tests, level, onLevelChange, onStartExam, onPractice, onS
 
   return (
     <div className="min-h-dvh flex flex-col bg-exam-bg">
-      {/* Hero Header */}
-      <header className="bg-gradient-to-br from-telc via-telc-dark to-telc-darker text-white pt-10 pb-8 px-6 text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-4 left-8 w-32 h-32 rounded-full bg-white/20 blur-2xl" />
-          <div className="absolute bottom-2 right-12 w-40 h-40 rounded-full bg-white/15 blur-3xl" />
+      {/* Compact top bar — logo bleeds into gradient */}
+      <header className="bg-gradient-to-br from-telc via-telc-dark to-telc-darker text-white px-4 pt-safe relative overflow-hidden">
+        {/* Subtle ambient glow */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <div className="absolute top-0 right-8 w-32 h-32 rounded-full bg-white/20 blur-2xl" />
         </div>
-        <div className="relative flex flex-col items-center gap-3">
-          {/* Logo — primary brand element */}
+
+        {/* Main nav row */}
+        <div className="relative flex items-center gap-3 py-2">
+          {/* Logo — large, top-left, bleeds into the green background seamlessly */}
           <img
             src="/logo.png"
-            alt="telc sim"
-            className="w-24 h-24 rounded-[22px] shadow-xl ring-2 ring-white/20"
+            alt="TELC Sim"
+            className="w-16 h-16 rounded-2xl"
+            style={{
+              filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
+              marginLeft: '-4px',
+            }}
           />
-          <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight">
-              telc sim
-            </h1>
-            <p className="text-white/60 text-xs font-semibold tracking-widest uppercase mt-0.5">
-              Deutsch Prüfungssimulator
-            </p>
+          <div className="flex-1 min-w-0">
+            <div className="font-extrabold text-xl leading-tight tracking-tight">TELC Sim</div>
+            <div className="text-white/60 text-[11px] font-semibold tracking-wider uppercase leading-none mt-0.5">
+              {cfg.name} · {cfg.subtitle}
+            </div>
           </div>
-          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-xs font-bold px-3 py-1.5 rounded-full">
-            <Sparkles size={12} />
-            {cfg.name} — {cfg.subtitle}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Sparkles size={12} className="text-white/50" />
+            <span className="text-xs font-bold text-white/70">Prüfungssimulator</span>
           </div>
+        </div>
+
+        {/* Level selector — inside the green header, seamless */}
+        <div className="relative flex items-center gap-1 pb-3">
+          {ALL_LEVELS.map((lv, i) => {
+            const prog = levelProgress[lv];
+            const isActive = lv === level;
+            const isUnlocked = i === 0 || levelProgress[ALL_LEVELS[i - 1]].badge === 'passed';
+            return (
+              <div key={lv} className="flex items-center flex-1 min-w-0">
+                <button
+                  onClick={() => onLevelChange(lv)}
+                  className={`flex-1 flex flex-col items-center py-1.5 px-2 rounded-xl transition-all ${
+                    isActive
+                      ? 'bg-white/20 backdrop-blur-sm border border-white/30'
+                      : 'hover:bg-white/10 border border-transparent'
+                  }`}
+                >
+                  <div className="flex items-center gap-1">
+                    {prog.badge === 'passed' ? (
+                      <CheckCircle2 size={11} className="text-white/90" />
+                    ) : !isUnlocked ? (
+                      <Lock size={10} className="text-white/30" />
+                    ) : null}
+                    <span className={`text-xs font-extrabold ${isActive ? 'text-white' : 'text-white/50'}`}>
+                      {lv}
+                    </span>
+                  </div>
+                  {prog.tests > 0 ? (
+                    <span className="text-[9px] font-bold text-white/50">{Math.round(prog.passRate)}%</span>
+                  ) : (
+                    <span className="text-[9px] text-white/25">—</span>
+                  )}
+                </button>
+                {i < ALL_LEVELS.length - 1 && (
+                  <div className={`w-3 h-px shrink-0 ${prog.badge === 'passed' ? 'bg-white/40' : 'bg-white/15'}`} />
+                )}
+              </div>
+            );
+          })}
         </div>
       </header>
 
-      {/* Level progression strip */}
-      <div className="bg-white border-b-2 border-card-border px-4 py-3">
-        <div className="max-w-3xl mx-auto flex items-center gap-2">
-          <TrendingUp size={14} className="text-gray-400 shrink-0" />
-          <div className="flex flex-1 items-center gap-1.5">
-            {ALL_LEVELS.map((lv, i) => {
-              const lc = LEVEL_CONFIGS[lv];
-              const prog = levelProgress[lv];
-              const isActive = lv === level;
-              const isUnlocked = i === 0 || levelProgress[ALL_LEVELS[i - 1]].badge === 'passed';
-              return (
-                <div key={lv} className="flex items-center flex-1 min-w-0">
-                  <button
-                    onClick={() => onLevelChange(lv)}
-                    className={`flex-1 flex flex-col items-center py-1.5 px-2 rounded-xl transition-all ${
-                      isActive
-                        ? `${lc.bgLight} border-2 ${lc.borderClass}`
-                        : 'hover:bg-exam-bg border-2 border-transparent'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1">
-                      {prog.badge === 'passed' ? (
-                        <CheckCircle2 size={12} className={lc.colorClass} />
-                      ) : !isUnlocked ? (
-                        <Lock size={11} className="text-gray-300" />
-                      ) : null}
-                      <span className={`text-xs font-extrabold ${isActive ? lc.colorClass : prog.badge === 'passed' ? lc.colorClass : 'text-gray-400'}`}>
-                        {lv}
-                      </span>
-                    </div>
-                    {prog.tests > 0 ? (
-                      <span className="text-[10px] font-bold text-gray-400">{Math.round(prog.passRate)}%</span>
-                    ) : (
-                      <span className="text-[10px] font-medium text-gray-300">—</span>
-                    )}
-                  </button>
-                  {i < ALL_LEVELS.length - 1 && (
-                    <div className={`w-4 h-px shrink-0 ${levelProgress[lv].badge === 'passed' ? 'bg-correct' : 'bg-gray-200'}`} />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6 space-y-6">
         {/* Capability checks */}
