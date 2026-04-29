@@ -56,6 +56,22 @@ body {
   min-height: 100dvh;
 }
 
+/* Prevent browser selection toolbar (Edge smart-actions etc.) on double-click */
+#root {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Re-enable selection inside form inputs and reading panels */
+input,
+textarea,
+[contenteditable],
+.reading-panel,
+.allow-select {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
 /* ── CURSOR FIX — every interactive element gets pointer ─ */
 button,
 label,

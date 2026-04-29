@@ -4,16 +4,23 @@ import { getStudyDataForLevel } from '../study-data';
 import type { ExamLevel } from '../levelConfig';
 import {
   BookOpen, Languages, ChevronRight, ChevronDown,
-  ArrowLeft, Search, Gamepad2, CreditCard, HelpCircle, Star, BrainCircuit, Puzzle,
+  ArrowLeft, Search, Gamepad2, CreditCard, HelpCircle, Star,
+  BrainCircuit, Puzzle, Type, Grid2x2, Mic, Flame, Zap,
 } from 'lucide-react';
 import { getStats } from '../vocabTracking';
+import { getXPData, getLevelFromXP } from '../xpTracking';
 import { Flashcards } from './Flashcards';
 import { VocabQuiz } from './VocabQuiz';
 import { GrammarQuiz } from './GrammarQuiz';
 import { SentenceBuilder } from './SentenceBuilder';
+import { ArtikelTrainer } from './ArtikelTrainer';
+import { MemoryMatch } from './MemoryMatch';
+import { Diktat } from './Diktat';
+import { Lueckentext } from './Lueckentext';
 
 type Tab = 'games' | 'vocabulary' | 'grammar';
-type ActiveGame = 'flashcards' | 'quiz' | 'grammar-quiz' | 'sentence-builder' | null;
+type ActiveGame = 'flashcards' | 'quiz' | 'grammar-quiz' | 'sentence-builder'
+  | 'artikel' | 'memory' | 'diktat' | 'lueckentext' | null;
 
 export function Study({ onBack, level = 'A1' }: { onBack: () => void; level?: ExamLevel }) {
   const [tab, setTab] = useState<Tab>('games');
@@ -22,12 +29,12 @@ export function Study({ onBack, level = 'A1' }: { onBack: () => void; level?: Ex
   const studyData = getStudyDataForLevel(level);
 
   // ── Active game screens ─────────────────────────────────────────
-  if (activeGame === 'grammar-quiz') {
-    return <GrammarQuiz level={level} onBack={() => setActiveGame(null)} />;
-  }
-  if (activeGame === 'sentence-builder') {
-    return <SentenceBuilder level={level} onBack={() => setActiveGame(null)} />;
-  }
+  if (activeGame === 'grammar-quiz') return <GrammarQuiz level={level} onBack={() => setActiveGame(null)} />;
+  if (activeGame === 'sentence-builder') return <SentenceBuilder level={level} onBack={() => setActiveGame(null)} />;
+  if (activeGame === 'artikel') return <ArtikelTrainer level={level} onBack={() => setActiveGame(null)} />;
+  if (activeGame === 'memory') return <MemoryMatch level={level} onBack={() => setActiveGame(null)} />;
+  if (activeGame === 'diktat') return <Diktat level={level} onBack={() => setActiveGame(null)} />;
+  if (activeGame === 'lueckentext') return <Lueckentext level={level} onBack={() => setActiveGame(null)} />;
   if (activeGame === 'flashcards') {
     return <Flashcards level={level} onBack={() => setActiveGame(null)} />;
   }
@@ -101,6 +108,10 @@ export function Study({ onBack, level = 'A1' }: { onBack: () => void; level?: Ex
               onQuiz={() => setActiveGame('quiz')}
               onGrammarQuiz={() => setActiveGame('grammar-quiz')}
               onSentenceBuilder={() => setActiveGame('sentence-builder')}
+              onArtikel={() => setActiveGame('artikel')}
+              onMemory={() => setActiveGame('memory')}
+              onDiktat={() => setActiveGame('diktat')}
+              onLueckentext={() => setActiveGame('lueckentext')}
             />
           </div>
         )}
@@ -113,33 +124,56 @@ export function Study({ onBack, level = 'A1' }: { onBack: () => void; level?: Ex
 
 // ── Games ────────────────────────────────────────────────────────
 
-function GamesView({ onFlashcards, onQuiz, onGrammarQuiz, onSentenceBuilder }: {
+function GamesView({ onFlashcards, onQuiz, onGrammarQuiz, onSentenceBuilder, onArtikel, onMemory, onDiktat, onLueckentext }: {
   onFlashcards: () => void;
   onQuiz: () => void;
   onGrammarQuiz: () => void;
   onSentenceBuilder: () => void;
+  onArtikel: () => void;
+  onMemory: () => void;
+  onDiktat: () => void;
+  onLueckentext: () => void;
 }) {
   const stats = getStats();
+  const xp = getXPData();
+  const lvl = getLevelFromXP(xp.totalXP);
   return (
     <div className="space-y-4">
-      {/* Vocab progress banner */}
-      {(stats.lookedUp > 0 || stats.known > 0) && (
-        <div className="card !rounded-2xl p-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-telc/10 flex items-center justify-center shrink-0">
-            <Star size={20} className="text-telc" />
+      {/* XP + Streak banner */}
+      <div className="card !rounded-2xl p-4 flex items-center gap-4">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-telc to-telc-dark text-white flex items-center justify-center shrink-0 shadow-sm">
+          <Zap size={22} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="font-extrabold text-sm">{xp.totalXP} XP</span>
+            <span className="text-xs text-gray-400">·</span>
+            <span className="text-xs font-bold text-telc">{lvl.label}</span>
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Dein Fortschritt</div>
-            <div className="flex gap-4">
-              <span className="text-sm font-bold text-correct">{stats.known} gelernt</span>
-              <span className="text-sm font-bold text-section-hoeren">{stats.lookedUp} nachgeschlagen</span>
-            </div>
+          <div className="progress-track !h-1.5">
+            <div className="progress-fill bg-telc" style={{ width: `${Math.min(100, (xp.totalXP / lvl.nextAt) * 100)}%` }} />
+          </div>
+        </div>
+        {xp.currentStreak > 0 && (
+          <div className="flex items-center gap-1 shrink-0">
+            <Flame size={16} className="text-wrong" />
+            <span className="font-extrabold text-sm text-wrong">{xp.currentStreak}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Vocab stats */}
+      {(stats.lookedUp > 0 || stats.known > 0) && (
+        <div className="card !rounded-2xl p-3 flex items-center gap-4">
+          <Star size={16} className="text-telc shrink-0" />
+          <div className="flex gap-4 text-sm">
+            <span className="font-bold text-correct">{stats.known} gelernt</span>
+            <span className="font-bold text-section-hoeren">{stats.lookedUp} nachgeschlagen</span>
           </div>
         </div>
       )}
-      <p className="text-sm text-gray-500 font-medium">
-        Lerne spielerisch! Wähle eine Aktivität:
-      </p>
+
+      <p className="text-sm text-gray-500 font-medium">Wähle eine Aktivität:</p>
 
       <button
         onClick={onFlashcards}
@@ -208,23 +242,78 @@ function GamesView({ onFlashcards, onQuiz, onGrammarQuiz, onSentenceBuilder }: {
         </div>
       </button>
 
-      <button
-        onClick={onSentenceBuilder}
-        className="card card-interactive w-full !rounded-2xl p-5 text-left group"
-      >
+      <button onClick={onSentenceBuilder} className="card card-interactive w-full !rounded-2xl p-5 text-left group">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-telc text-white flex items-center justify-center shadow-sm shrink-0">
-            <Puzzle size={26} />
-          </div>
+          <div className="w-14 h-14 rounded-2xl bg-telc text-white flex items-center justify-center shadow-sm shrink-0"><Puzzle size={26} /></div>
           <div className="flex-1">
             <div className="font-extrabold text-telc group-hover:text-telc-dark transition-colors">Satzpuzzle</div>
-            <div className="text-sm text-gray-500">Wörter in die richtige Reihenfolge bringen — Wortstellung üben</div>
+            <div className="text-sm text-gray-500">Wörter in die richtige Reihenfolge — Wortstellung üben</div>
             <div className="flex gap-1.5 mt-2">
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-telc-light text-telc-dark">V2-Regel</span>
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">40+ Sätze</span>
             </div>
           </div>
-          <ChevronRight size={18} className="text-gray-300 group-hover:text-telc transition-colors shrink-0" />
+          <ChevronRight size={18} className="text-gray-300 shrink-0" />
+        </div>
+      </button>
+
+      <button onClick={onArtikel} className="card card-interactive w-full !rounded-2xl p-5 text-left group">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-section-lesen-dark text-white flex items-center justify-center shadow-sm shrink-0"><Type size={26} /></div>
+          <div className="flex-1">
+            <div className="font-extrabold text-section-lesen-dark">Artikel-Trainer</div>
+            <div className="text-sm text-gray-500">der · die · das — so schnell wie möglich! 60-Sekunden Sprint</div>
+            <div className="flex gap-1.5 mt-2">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-section-lesen-light text-section-lesen-dark">Zeitdruck</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">der/die/das</span>
+            </div>
+          </div>
+          <ChevronRight size={18} className="text-gray-300 shrink-0" />
+        </div>
+      </button>
+
+      <button onClick={onLueckentext} className="card card-interactive w-full !rounded-2xl p-5 text-left group">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-section-hoeren text-white flex items-center justify-center shadow-sm shrink-0"><BookOpen size={26} /></div>
+          <div className="flex-1">
+            <div className="font-extrabold text-section-hoeren">Lückentext</div>
+            <div className="text-sm text-gray-500">Fehlende Wörter in Lesetexten ergänzen — Grammatik in Kontext</div>
+            <div className="flex gap-1.5 mt-2">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-section-hoeren-light text-section-hoeren">Lesetexte</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Grammatik</span>
+            </div>
+          </div>
+          <ChevronRight size={18} className="text-gray-300 shrink-0" />
+        </div>
+      </button>
+
+      <button onClick={onMemory} className="card card-interactive w-full !rounded-2xl p-5 text-left group">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-correct text-white flex items-center justify-center shadow-sm shrink-0"><Grid2x2 size={26} /></div>
+          <div className="flex-1">
+            <div className="font-extrabold text-correct">Memory</div>
+            <div className="text-sm text-gray-500">Deutsch-Englisch Paare aufdecken — Gedächtnistraining</div>
+            <div className="flex gap-1.5 mt-2">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-correct/10 text-correct">8 Paare</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Alle Themen</span>
+            </div>
+          </div>
+          <ChevronRight size={18} className="text-gray-300 shrink-0" />
+        </div>
+      </button>
+
+      <button onClick={onDiktat} className="card card-interactive w-full !rounded-2xl p-5 text-left group">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-gray-600 text-white flex items-center justify-center shadow-sm shrink-0"><Mic size={26} /></div>
+          <div className="flex-1">
+            <div className="font-extrabold text-gray-700">Diktat</div>
+            <div className="text-sm text-gray-500">Satz anhören und aufschreiben — Rechtschreibung & Hören kombiniert</div>
+            <div className="flex gap-1.5 mt-2">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">8 Sätze</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">TTS</span>
+            </div>
+          </div>
+          <ChevronRight size={18} className="text-gray-300 shrink-0" />
         </div>
       </button>
     </div>

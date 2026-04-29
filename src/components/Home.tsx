@@ -9,6 +9,8 @@ import { isTTSAvailable, isSTTAvailable, isUsingFallbackTTS } from '../speech';
 import { isLLMConfigured } from '../llm';
 import { loadHistory, computeStats, computeLevelProgress } from '../history';
 import { type ExamLevel, ALL_LEVELS, LEVEL_CONFIGS } from '../levelConfig';
+import { getXPData, getLevelFromXP } from '../xpTracking';
+import { Flame, Zap } from 'lucide-react';
 
 interface HomeProps {
   tests: TelcTest[];
@@ -142,6 +144,35 @@ export function Home({ tests, level, onLevelChange, onStartExam, onPractice, onS
 
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6 space-y-6">
+        {/* XP + Streak strip */}
+        {(() => {
+          const xp = getXPData();
+          const lvl = getLevelFromXP(xp.totalXP);
+          return (
+            <div className="card !rounded-2xl p-4 flex items-center gap-3 fade-in">
+              <div className="w-10 h-10 rounded-xl bg-telc/10 flex items-center justify-center shrink-0">
+                <Zap size={18} className="text-telc" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-extrabold text-telc">{lvl.label}</span>
+                  <span className="text-xs text-gray-400">· {xp.totalXP} XP</span>
+                </div>
+                <div className="progress-track !h-1.5">
+                  <div className="progress-fill bg-telc" style={{ width: `${Math.min(100, (xp.totalXP / lvl.nextAt) * 100)}%` }} />
+                </div>
+              </div>
+              {xp.currentStreak > 0 && (
+                <div className="flex items-center gap-1 shrink-0 bg-wrong/10 px-2.5 py-1.5 rounded-xl">
+                  <Flame size={14} className="text-wrong" />
+                  <span className="text-sm font-extrabold text-wrong">{xp.currentStreak}</span>
+                  <span className="text-[10px] text-wrong/70 font-bold">Tage</span>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
         {/* Capability checks */}
         <div className="flex flex-wrap gap-2 justify-center text-xs fade-in">
           <span className={`px-3 py-1.5 rounded-full font-semibold ${

@@ -22,16 +22,22 @@ export function WordLookupProvider({ children, enabled = true }: { children: Rea
 
   const handleDblClick = useCallback((e: MouseEvent) => {
     if (!enabled) return;
+
+    // Read the selection first
     let sel = window.getSelection()?.toString().trim() ?? '';
-    // Triple-click selects a whole line — extract the word nearest the cursor instead
+
+    // If selection is a whole line (triple-click), use caretRangeFromPoint instead
     if (sel.includes(' ') && sel.length > 40) {
-      // Fall back to the word under the mouse via caretRangeFromPoint
       const range = document.caretRangeFromPoint?.(e.clientX, e.clientY);
       if (range) {
         (range as any).expand?.('word');
         sel = range.toString().trim();
       }
     }
+
+    // Immediately kill the browser selection — prevents Edge/Chrome toolbar from appearing
+    window.getSelection()?.removeAllRanges();
+
     if (!sel || sel.length < 2 || sel.length > 40) return;
 
     // Strip articles/punctuation to get the bare word
@@ -77,7 +83,7 @@ export function WordLookupProvider({ children, enabled = true }: { children: Rea
   }, [popup]);
 
   return (
-    <div ref={containerRef} className="relative min-h-0 flex-1 flex flex-col">
+    <div ref={containerRef} className="relative min-h-0 flex-1 flex flex-col allow-select">
       {children}
       {popup && (
         <WordPopupCard
