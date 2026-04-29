@@ -44,7 +44,7 @@ export function Study({ onBack, level = 'A1' }: { onBack: () => void; level?: Ex
         </button>
         <h1 className="font-extrabold text-lg">Lernmaterial</h1>
         <div className="flex-1" />
-        <img src="/logo.png" alt="" style={{width:'30px',height:'30px',filter:'drop-shadow(0 1px 4px rgba(0,0,0,0.35))'}} />
+        <img src="/logo.png" alt="" className="w-8 h-8 rounded-xl shadow-sm" />
         <div className="flex gap-1 bg-exam-bg rounded-xl p-1">
           <button
             onClick={() => setTab('games')}

@@ -23,7 +23,7 @@ export function ExamPicker({ tests, onStart, onBack }: ExamPickerProps) {
           {cfg.label}
         </span>
         <div className="flex-1" />
-        <img src="/logo.png" alt="" style={{width:'30px',height:'30px',filter:'drop-shadow(0 1px 4px rgba(0,0,0,0.35))'}} />
+        <img src="/logo.png" alt="" className="w-8 h-8 rounded-xl shadow-sm" />
       </div>
 
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-6 space-y-4">

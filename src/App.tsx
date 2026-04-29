@@ -418,7 +418,7 @@ function App() {
             className="shrink-0"
             title="Zur Startseite"
           >
-            <img src="/logo.png" alt="telc sim" style={{width:'36px',height:'36px',filter:'drop-shadow(0 2px 6px rgba(0,0,0,0.4))'}} />
+            <img src="/logo.png" alt="telc sim" className="w-9 h-9 rounded-xl shadow-sm" />
           </button>
           <span className="text-gray-200">|</span>
           <button
