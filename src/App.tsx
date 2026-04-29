@@ -418,7 +418,7 @@ function App() {
             className="shrink-0"
             title="Zur Startseite"
           >
-            <img src="/logo.png" alt="telc sim" className="w-8 h-8 rounded-lg" />
+            <img src="/logo.png" alt="telc sim" className="w-9 h-9 rounded-xl" />
           </button>
           <span className="text-gray-200">|</span>
           <button

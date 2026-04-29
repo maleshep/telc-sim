@@ -75,25 +75,30 @@ export function Home({ tests, level, onLevelChange, onStartExam, onPractice, onS
   return (
     <div className="min-h-dvh flex flex-col bg-exam-bg">
       {/* Hero Header */}
-      <header className="bg-gradient-to-br from-telc via-telc-dark to-telc-darker text-white py-8 px-6 text-center relative overflow-hidden">
+      <header className="bg-gradient-to-br from-telc via-telc-dark to-telc-darker text-white pt-10 pb-8 px-6 text-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-4 left-8 w-24 h-24 rounded-full bg-white/20 blur-xl" />
-          <div className="absolute bottom-2 right-12 w-32 h-32 rounded-full bg-white/15 blur-2xl" />
+          <div className="absolute top-4 left-8 w-32 h-32 rounded-full bg-white/20 blur-2xl" />
+          <div className="absolute bottom-2 right-12 w-40 h-40 rounded-full bg-white/15 blur-3xl" />
         </div>
-        <div className="relative">
-          <div className="flex justify-center mb-3">
-            <img src="/logo.png" alt="telc sim" className="w-16 h-16 rounded-2xl shadow-lg" />
+        <div className="relative flex flex-col items-center gap-3">
+          {/* Logo — primary brand element */}
+          <img
+            src="/logo.png"
+            alt="telc sim"
+            className="w-24 h-24 rounded-[22px] shadow-xl ring-2 ring-white/20"
+          />
+          <div>
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight">
+              telc sim
+            </h1>
+            <p className="text-white/60 text-xs font-semibold tracking-widest uppercase mt-0.5">
+              Deutsch Prüfungssimulator
+            </p>
           </div>
-          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-sm font-semibold px-4 py-1.5 rounded-full mb-3">
-            <Sparkles size={14} />
-            Prüfungssimulator
+          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-xs font-bold px-3 py-1.5 rounded-full">
+            <Sparkles size={12} />
+            {cfg.name} — {cfg.subtitle}
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            {cfg.name}
-          </h1>
-          <p className="mt-1.5 text-white/70 text-sm">
-            {cfg.subtitle} — Bereite dich auf die Prüfung vor
-          </p>
         </div>
       </header>
 

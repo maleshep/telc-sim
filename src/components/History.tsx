@@ -233,6 +233,7 @@ export function History({ onBack }: HistoryProps) {
         <Award size={20} className="text-telc" />
         <h1 className="font-extrabold text-lg">Verlauf</h1>
         <div className="flex-1" />
+        <img src="/logo.png" alt="" className="w-8 h-8 rounded-lg opacity-80 mr-1" />
 
         {/* Filter toggle */}
         <div className="flex gap-1 bg-exam-bg rounded-xl p-1 mr-2">

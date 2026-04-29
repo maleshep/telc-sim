@@ -22,6 +22,8 @@ export function ExamPicker({ tests, onStart, onBack }: ExamPickerProps) {
         <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${cfg.bgLight} ${cfg.colorClass}`}>
           {cfg.label}
         </span>
+        <div className="flex-1" />
+        <img src="/logo.png" alt="" className="w-8 h-8 rounded-lg opacity-80" />
       </div>
 
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-6 space-y-4">
